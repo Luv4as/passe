@@ -1,24 +1,21 @@
 // src/modules/players/dto/create-player.dto.ts
-import { IsDecimal, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { IsDecimal, IsEnum, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
 
 export class CreatePlayerDto {
     @IsString()
     @IsNotEmpty()
     nome: string;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsEnum(['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'], {
+        message: 'Posição deve ser GOL, ZAG, LAT, MEI ou ATA',
+    })
     posicao: 'GOL' | 'ZAG' | 'LAT' | 'MEI' | 'ATA';
-    
+
     @IsInt()
     @Min(16)
     @Max(45)
     idade: number;
-    
-    @IsString()
-    @IsNotEmpty()
-    condicao: 'APTO' | 'MAL_CONDICIONADO' | 'DOENTE';
-    
+
     @IsInt()
     @Min(1)
     @Max(100)

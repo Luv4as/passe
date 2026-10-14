@@ -1,35 +1,48 @@
 
-import { Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, HttpCode, Param, Patch, Post, Put } from '@nestjs/common';
+import { PlayersService } from './players.service';
+import { CreatePlayerDto } from './dto/create-player.dto';
+import { UpdateConditionDto } from './dto/update-condition.dto';
+import { UpdatePlayerDto } from './dto/update-player.dto';
 
 @Controller('players')
 export class PlayersController {
+    constructor(private readonly playersService: PlayersService) { }
+
     @Get()
-    findAll(): string {
-        return 'This action returns all players';
+    findAll() {
+        return this.playersService.findAll();
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string): string {
-        return `This action returns player with id: ${id}`;
+    findOne(@Param('id') id: number) {
+        return this.playersService.findOne(id);
     }
 
     @Post()
-    create(): string {
-        return 'This action creates a new player';
+    async create(@Body() CreatePlayerDto: CreatePlayerDto) {
+        return this.playersService.create(CreatePlayerDto);
     }
 
     @Put(':id')
-    update(@Param('id') id: string): string {
-        return `This action updates player with id: ${id}`;
+    update(
+        @Param('id') id: number,
+        @Body() dto: UpdatePlayerDto
+    ) {
+        return this.playersService.update(id, dto);
     }
 
-    @Patch(':id')
-    partialUpdate(@Param('id') id: string): string {
-        return `This action partially updates player with id: ${id}`;
+    @Patch(':id/condition')
+    partialUpdate(
+        @Param('id') id: number,
+        @Body() dto: UpdateConditionDto
+    ) {
+        return this.playersService.updateCondition(id, dto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string): string {
-        return `This action removes player with id: ${id}`;
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async deletePlayer(@Param('id') id: number) {
+        return this.playersService.deletePlayer(id);
     }
 }
