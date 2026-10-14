@@ -4,6 +4,7 @@ import { PlayersService } from './players.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdateConditionDto } from './dto/update-condition.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
+import { ParseIdPipe } from '../../common/pipes/parse-id.pipe';
 
 @Controller('players')
 export class PlayersController {
@@ -15,7 +16,7 @@ export class PlayersController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: number) {
+    findOne(@Param('id', ParseIdPipe) id: number) {
         return this.playersService.findOne(id);
     }
 
@@ -26,7 +27,7 @@ export class PlayersController {
 
     @Put(':id')
     update(
-        @Param('id') id: number,
+        @Param('id', ParseIdPipe) id: number,
         @Body() dto: UpdatePlayerDto
     ) {
         return this.playersService.update(id, dto);
@@ -34,7 +35,7 @@ export class PlayersController {
 
     @Patch(':id/condition')
     partialUpdate(
-        @Param('id') id: number,
+        @Param('id', ParseIdPipe) id: number,
         @Body() dto: UpdateConditionDto
     ) {
         return this.playersService.updateCondition(id, dto);
@@ -42,7 +43,7 @@ export class PlayersController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async deletePlayer(@Param('id') id: number) {
+    async deletePlayer(@Param('id', ParseIdPipe) id: number) {
         return this.playersService.deletePlayer(id);
     }
 }

@@ -12,5 +12,5 @@ export class UpdateConditionDto {
     @IsEnum(PlayerCondition, {
     message: 'A condição deve ser APTO, MAL_CONDICIONADO ou DOENTE',
   })
-    condicao: 'APTO' | 'MAL_CONDICIONADO' | 'DOENTE';
+    condition: 'APTO' | 'MAL_CONDICIONADO' | 'DOENTE';
 }

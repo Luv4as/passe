@@ -18,81 +18,106 @@ export class PlayersService {
     constructor(private readonly prisma: PrismaService) { }
 
     private calcularOverall(player: {
-        posicao: string;
-        velocidade: number;
-        finalizacao: number;
-        passe: number;
-        dribble?: number;
+        position?: string;
+        posicao?: string;
+        pace?: number;
+        velocidade?: number;
+        shooting?: number;
+        finalizacao?: number;
+        passing?: number;
+        passe?: number;
+        dribbling?: number;
         drible?: number;
-        defesa: number;
-        fisico: number;
+        defending?: number;
+        defesa?: number;
+        physical?: number;
+        fisico?: number;
     }): number {
-        const pesos = PESOS_POSICAO[player.posicao];
+        const posicao = player.position ?? player.posicao ?? '';
+        const velocidade = player.pace ?? player.velocidade ?? 0;
+        const finalizacao = player.shooting ?? player.finalizacao ?? 0;
+        const passe = player.passing ?? player.passe ?? 0;
+        const drible = player.dribbling ?? player.drible ?? 0;
+        const defesa = player.defending ?? player.defesa ?? 0;
+        const fisico = player.physical ?? player.fisico ?? 0;
+        const pesos = PESOS_POSICAO[posicao];
 
         if (!pesos) {
             throw new BadRequestException({ message: `Posição inválida: ${player.posicao}` });
         }
 
-        const dribleVal = player.drible ?? player.dribble ?? 0;
+        const somaProdutos =
+            velocidade * pesos.velocidade +
+            finalizacao * pesos.finalizacao +
+            passe * pesos.passe +
+            drible * pesos.drible +
+            defesa * pesos.defesa +
+            fisico * pesos.fisico;
 
-        const overall =
-            player.velocidade * pesos.velocidade +
-            player.finalizacao * pesos.finalizacao +
-            player.passe * pesos.passe +
-            dribleVal * pesos.drible +
-            player.defesa * pesos.defesa +
-            player.fisico * pesos.fisico;
-
-        return Number(overall.toFixed(2));
+        return Math.round(somaProdutos);
     }
 
     private calcularValorBase(dto: CreatePlayerDto): number {
         const overall = this.calcularOverall(dto);
 
-        let valorBase = 0;
-        if (overall <= 50) {
-            valorBase = overall * 0.1;
-        } else if (overall <= 70) {
-            valorBase = 5.0 + (overall - 50) * 0.25;
-        } else if (overall <= 85) {
-            valorBase = 10.0 + (overall - 70) * 0.5;
-        } else {
-            valorBase = 17.5 + (overall - 85) * 1.0;
+        let parteOverall = 0;
+        if (overall > 40) {
+            const faixa1 = Math.min(overall, 60) - 40;
+            parteOverall += faixa1 * 0.5;
+        } else if (overall > 60) {
+            const faixa2 = Math.min(overall, 75) - 60;
+            parteOverall += faixa2 * 2.0;
+        } else if (overall > 75) {
+            const faixa3 = overall - 75;
+            parteOverall += faixa3 * 6.0;
+        }
+        let valorBase = parteOverall;
+
+        if (dto.age <= 21) {
+            valorBase = parteOverall * ((100 + dto.potential - overall) / 100);
         }
 
-        if (dto.idade <= 21) {
-            const jovemPromessa = (22 - dto.idade) * 0.05;
-            valorBase += valorBase * jovemPromessa;
+        if (valorBase < 1.0) {
+            valorBase = 1.0;
         }
 
         return Number(valorBase.toFixed(2));
     }
 
+    private calcularDescontoCondicao(player: { condition: string; agility: number }): number {
+        if (player.condition === 'APTO') {
+            return 0;
+        }
+        let baseDesconto = player.condition === 'MAL_CONDICIONADO' ? 15 : 30;
+
+        if (player.agility >= 80) {
+            baseDesconto /= 2;
+        } else if (player.agility <= 30) {
+            baseDesconto += 10;
+        }
+
+        return baseDesconto;
+    }
+
     public calcularValorMercado(player: any): number {
         const valorBase = Number(player.valor_base);
+        const descontoCondicao = this.calcularDescontoCondicao(player);
 
-        let percDescontoCondicao = 0;
-        if (player.condicao === 'MAL_CONDICIONADO') {
-            percDescontoCondicao = 0.10 * (1 - player.condicao_nivel / 100);
-        } else if (player.condicao === 'DOENTE') {
-            percDescontoCondicao = 0.30 * (1 - player.condicao_nivel / 100);
+        let ajusteIdade = 0;
+        if (player.age <= 21) {
+            ajusteIdade = 10;
+        } else if (player.age >= 32) {
+            ajusteIdade = -10;
         }
 
-        let percAjusteIdade = 0;
-        if (player.idade >= 32) {
-            percAjusteIdade = (player.idade - 31) * 0.05;
-        } else if (player.idade <= 21) {
-            percAjusteIdade = -(22 - player.idade) * 0.03;
+        let percDescontoTotal = ajusteIdade - descontoCondicao;
+        if (percDescontoTotal < -40) {
+            percDescontoTotal = -40;
         }
 
-        let percDescontoTotal = percDescontoCondicao + percAjusteIdade;
-        if (percDescontoTotal > 0.40) {
-            percDescontoTotal = 0.40;
-        }
-
-        let valorMercado = valorBase * (1 - percDescontoTotal);
-        if (valorMercado < 1.00) {
-            valorMercado = 1.00;
+        let valorMercado = valorBase * ((100 + percDescontoTotal) / 100);
+        if (valorMercado < 1.0) {
+            valorMercado = 1.0;
         }
 
         return Number(valorMercado.toFixed(2));
@@ -103,17 +128,17 @@ export class PlayersService {
 
         return this.prisma.jogadores.create({
             data: {
-                nome: dto.nome,
-                idade: dto.idade,
-                posicao: dto.posicao,
-                agilidade: dto.agilidade,
-                velocidade: dto.velocidade,
-                finalizacao: dto.finalizacao,
-                passe: dto.passe,
-                drible: dto.drible,
-                defesa: dto.defesa,
-                fisico: dto.fisico,
-                potencial: dto.potencial,
+                nome: dto.name,
+                idade: dto.age,
+                posicao: dto.position,
+                agilidade: dto.agility,
+                velocidade: dto.pace,
+                finalizacao: dto.shooting,
+                passe: dto.passing,
+                drible: dto.dribbling,
+                defesa: dto.defending,
+                fisico: dto.physical,
+                potencial: dto.potential,
                 condicao: 'APTO',
                 valor_base: valorBase,
             },
@@ -153,25 +178,25 @@ export class PlayersService {
             throw new NotFoundException({ message: `Jogador com ID:${id} não encontrado` });
         }
 
-        if (dto.idade < player.idade) {
-            throw new ConflictException({ message: `A idade do jogador não pode ser reduzida. Idade atual: ${player.idade}, idade fornecida: ${dto.idade}` });
+        if (dto.age < player.idade) {
+            throw new ConflictException({ message: `A idade do jogador não pode ser reduzida. Idade atual: ${player.idade}, idade fornecida: ${dto.age}` });
         }
 
-        if (player.clube_id !== null && dto.posicao !== player.posicao) {
-            throw new ConflictException({ message: `Um jogador vinculado a um clube não pode alterar sua posição. Posição atual: ${player.posicao}, posição fornecida: ${dto.posicao}` });
+        if (player.clube_id !== null && dto.position !== player.posicao) {
+            throw new ConflictException({ message: `Um jogador vinculado a um clube não pode alterar sua posição. Posição atual: ${player.posicao}, posição fornecida: ${dto.position}` });
         }
 
-        if (dto.idade >= 35 && dto.agilidade > 85) {
-            throw new ConflictException({ message: `Jogadores com 35 anos ou mais não podem ter agilidade superior a 85. Idade atual: ${dto.idade}, agilidade fornecida: ${dto.agilidade}` });
+        if (dto.age >= 35 && dto.agility > 85) {
+            throw new ConflictException({ message: `Jogadores com 35 anos ou mais não podem ter agilidade superior a 85. Idade atual: ${dto.age}, agilidade fornecida: ${dto.agility}` });
         }
 
         return this.prisma.jogadores.update({
             where: { id },
             data: {
-                nome: dto.nome,
-                idade: dto.idade,
-                posicao: dto.posicao,
-                agilidade: dto.agilidade,
+                nome: dto.name,
+                idade: dto.age,
+                posicao: dto.position,
+                agilidade: dto.agility,
             },
         });
     }
@@ -186,12 +211,12 @@ export class PlayersService {
             throw new NotFoundException({ message: `Jogador com ID:${id} não encontrado.` });
         }
 
-        if (dto.condicao == 'APTO' && player.condicao == 'DOENTE') {
+        if (dto.condition == 'APTO' && player.condicao == 'DOENTE') {
             throw new ConflictException({ message: `Um jogador que está doente não pode ser marcado como APTO.` });
         }
 
         return this.prisma.$transaction(async (tx) => {
-            if (dto.condicao == 'DOENTE') {
+            if (dto.condition == 'DOENTE') {
                 await tx.escalacoes.deleteMany({
                     where: { jogador_id: id },
                 });
@@ -200,7 +225,7 @@ export class PlayersService {
             return tx.jogadores.update({
                 where: { id },
                 data: {
-                    condicao: dto.condicao,
+                    condicao: dto.condition,
                 },
             });
         });

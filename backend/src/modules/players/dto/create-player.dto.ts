@@ -1,58 +1,60 @@
 // src/modules/players/dto/create-player.dto.ts
-import { IsDecimal, IsEnum, IsInt, IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import { IsDecimal, IsEnum, IsInt, IsNotEmpty, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 
 export class CreatePlayerDto {
     @IsString()
     @IsNotEmpty()
-    nome: string;
+    @MinLength(3, { message: 'name deve ter no mínimo 3 caracteres' })
+    @MaxLength(100, { message: 'name deve ter no máximo 100 caracteres' })
+    name: string;
 
     @IsEnum(['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'], {
         message: 'Posição deve ser GOL, ZAG, LAT, MEI ou ATA',
     })
-    posicao: 'GOL' | 'ZAG' | 'LAT' | 'MEI' | 'ATA';
+    position: 'GOL' | 'ZAG' | 'LAT' | 'MEI' | 'ATA';
 
     @IsInt()
     @Min(16)
     @Max(45)
-    idade: number;
+    age: number;
 
     @IsInt()
     @Min(1)
     @Max(100)
-    agilidade: number;
+    agility: number;
 
     @IsInt()
     @Min(1)
     @Max(99)
-    velocidade: number;
+    pace: number;
 
     @IsInt()
     @Min(1)
     @Max(99)
-    finalizacao: number;
+    shooting: number;
 
     @IsInt()
     @Min(1)
     @Max(99)
-    passe: number;
+    passing: number;
 
     @IsInt()
     @Min(1)
     @Max(99)
-    drible: number;
+    dribbling: number;
 
     @IsInt()
     @Min(1)
     @Max(99)
-    defesa: number;
+    defending: number;
 
     @IsInt()
     @Min(1)
     @Max(99)
-    fisico: number;
+    physical: number;
 
     @IsInt()
     @Min(1)
     @Max(99)
-    potencial: number;
+    potential: number;
 }
