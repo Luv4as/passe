@@ -1,1 +1,46 @@
-# npm warn deprecated eslint@9.39.5: This version is no longer supported. Please see https://eslint.org/version-support for other options.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: passe
+      POSTGRES_PASSWORD: passe
+      POSTGRES_DB: passe
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U passe -d passe"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    profiles:
+      - full
+    environment:
+      NODE_ENV: production
+      PORT: 5173
+      DATABASE_URL: postgresql://passe:passe@db:5432/passe?schema=public
+    ports:
+      - "5173:5173"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    profiles:
+      - full
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
