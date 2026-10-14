@@ -3,6 +3,16 @@ Lucas Gonçalves Venancio
 
 ## Execução com Docker Compose
 
+Copie `.env.example` para `.env` na raiz e ajuste os valores:
+
+```bash
+cp .env.example .env
+```
+
+O `.env` da raiz configura o PostgreSQL no Docker Compose. Para executar
+comandos do Prisma diretamente dentro de `backend/`, use uma `DATABASE_URL`
+em `backend/.env` apontando para `localhost`.
+
 Para iniciar somente o PostgreSQL no desenvolvimento local:
 
 ```bash
@@ -20,4 +30,3 @@ Os serviços ficam disponíveis em:
 - Interface: http://localhost:3000
 - API: http://localhost:5173
 - PostgreSQL: localhost:5432
-
