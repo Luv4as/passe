@@ -17,37 +17,37 @@ const PESOS_POSICAO: Record<string, Record<string, number>> = {
 };
 
 function ordenarJogadores(mapped: any[], sortOption: string = 'name'): any[] {
-  const posOrder: Record<string, number> = { GOL: 1, ZAG: 2, LAT: 3, MEI: 4, ATA: 5 };
+    const posOrder: Record<string, number> = { GOL: 1, ZAG: 2, LAT: 3, MEI: 4, ATA: 5 };
 
-  return mapped.sort((a, b) => {
-    let diff = 0;
+    return mapped.sort((a, b) => {
+        let diff = 0;
 
-    if (sortOption === 'position') {
-      diff = (posOrder[a.position] || 99) - (posOrder[b.position] || 99);
-    } else if (sortOption === 'value_desc') {
-      diff = b.market_value - a.market_value;
-    } else if (sortOption === 'value_asc') {
-      diff = a.market_value - b.market_value;
-    } else if (sortOption === 'age_desc') {
-      diff = b.age - a.age;
-    } else if (sortOption === 'age_asc') {
-      diff = a.age - b.age;
-    }
+        if (sortOption === 'position') {
+            diff = (posOrder[a.position] || 99) - (posOrder[b.position] || 99);
+        } else if (sortOption === 'value_desc') {
+            diff = b.market_value - a.market_value;
+        } else if (sortOption === 'value_asc') {
+            diff = a.market_value - b.market_value;
+        } else if (sortOption === 'age_desc') {
+            diff = b.age - a.age;
+        } else if (sortOption === 'age_asc') {
+            diff = a.age - b.age;
+        }
 
-    if (diff !== 0) return diff;
+        if (diff !== 0) return diff;
 
-    const diffNome = compararNomes(a.name, b.name);
-    if (diffNome !== 0) return diffNome;
+        const diffNome = compararNomes(a.name, b.name);
+        if (diffNome !== 0) return diffNome;
 
-    return a.id - b.id;
-  });
+        return a.id - b.id;
+    });
 }
 
 @Injectable()
 export class PlayersService {
     constructor(private readonly prisma: PrismaService) { }
 
-    private calcularOverall(player: any): number {
+    public calcularOverall(player: any): number {
         const posicao = player.position ?? player.posicao ?? '';
         const velocidade = player.pace ?? player.velocidade ?? 0;
         const finalizacao = player.shooting ?? player.finalizacao ?? 0;
@@ -142,26 +142,32 @@ export class PlayersService {
         const maiorArtibuto = Math.max(...atributos);
         const somaAtributos = atributos.reduce((total, val) => total + val, 0);
 
-        if(somaAtributos > 480){
+        if (somaAtributos > 480) {
             throw new BadRequestException({ message: `A soma dos atributos não pode ser maior que 480. Soma atual: ${somaAtributos}` });
         }
-        if(dto.potential < maiorArtibuto){
+        if (dto.potential < maiorArtibuto) {
             throw new BadRequestException({ message: `O potencial do jogador não pode ser menor que o maior atributo. Potencial atual: ${dto.potential}, maior atributo: ${maiorArtibuto}` });
         }
 
-        if(dto.age >= 35 && dto.agility > 85){
+        if (dto.age >= 35 && dto.agility > 85) {
             throw new BadRequestException({ message: `Jogadores com 35 anos ou mais não podem ter agilidade superior a 85. Idade atual: ${dto.age}, agilidade fornecida: ${dto.agility}` });
+        }
+
+        if (dto.age >= 33 && dto.potential !== maiorArtibuto) {
+            throw new BadRequestException({
+                message: `Para jogadores com 33 anos ou mais, o potencial deve ser igual ao maior atributo (${maiorArtibuto}).`,
+            });
         }
 
         const nomeLimpo = dto.name.trim().replace(/\s+/g, ' ');
         const palavras = nomeLimpo.split(' ');
 
         if (palavras.length < 2) {
-            throw new BadRequestException({ message: 'O nome do jogador deve conter pelo menos duas palavras.'});
+            throw new BadRequestException({ message: 'O nome do jogador deve conter pelo menos duas palavras.' });
         }
 
-        if (/\d/.test(nomeLimpo)){
-            throw new BadRequestException({ message: 'O nome do jogador não pode conter números.'});
+        if (/\d/.test(nomeLimpo)) {
+            throw new BadRequestException({ message: 'O nome do jogador não pode conter números.' });
         }
         const valorBase = this.calcularValorBase(dto);
 
@@ -206,9 +212,9 @@ export class PlayersService {
 
         if (query.position) where.posicao = query.position;
         if (query.condition) where.condicao = query.condition;
-        
+
         if (query.free === true) where.clube_id = null;
-        else if(query.free === false) where.clube_id = {not: null};
+        else if (query.free === false) where.clube_id = { not: null };
 
         if (query.club_id) {
             const clubExists = await this.prisma.clubes.findUnique({
