@@ -6,6 +6,7 @@ import { UpdateConditionDto } from './dto/update-condition.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerMapper } from './mappers/player.mapper';
 import { FilterPlayerDto } from './dto/filter-player.dto';
+import { compararNomes, normalizarTexto } from '../../common/utils/string.util';
 
 const PESOS_POSICAO: Record<string, Record<string, number>> = {
     GOL: { velocidade: 0.10, finalizacao: 0.00, passe: 0.20, drible: 0.00, defesa: 0.40, fisico: 0.30 },
@@ -14,22 +15,6 @@ const PESOS_POSICAO: Record<string, Record<string, number>> = {
     MEI: { velocidade: 0.10, finalizacao: 0.15, passe: 0.35, drible: 0.25, defesa: 0.05, fisico: 0.10 },
     ATA: { velocidade: 0.20, finalizacao: 0.40, passe: 0.10, drible: 0.20, defesa: 0.00, fisico: 0.10 },
 };
-
-function normalizarTexto(texto: string): string {
-  return texto
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-}
-
-function compararNomes(nomeA: string, nomeB: string): number {
-  const normA = normalizarTexto(nomeA);
-  const normB = normalizarTexto(nomeB);
-
-  if (normA < normB) return -1;
-  if (normA > normB) return 1;
-  return 0;
-}
 
 function ordenarJogadores(mapped: any[], sortOption: string = 'name'): any[] {
   const posOrder: Record<string, number> = { GOL: 1, ZAG: 2, LAT: 3, MEI: 4, ATA: 5 };
