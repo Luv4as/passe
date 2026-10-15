@@ -141,7 +141,7 @@ export class ClubsService {
         if (siglaLimpa.length !== 3) {
             throw new BadRequestException({ message: `Sigla deve ter exatamente 3 caracteres` });
         }
-        if(!validarSiglaNoNome(nomeLimpo, siglaLimpa)) {
+        if (!validarSiglaNoNome(nomeLimpo, siglaLimpa)) {
             throw new BadRequestException({ message: `As letras da sigla devem aparecer no nome do clube na mesma ordem.` });
         }
 
@@ -165,9 +165,11 @@ export class ClubsService {
             throw new ConflictException({ message: `Clube com nome ${dto.name} já existe` });
         }
 
+        const nomeNormalizado = normalizarTexto(nomeLimpo);
         const newClub = await this.prisma.clubes.create({
             data: {
                 nome: nomeLimpo,
+                nome_normalizado: nomeNormalizado,
                 sigla: siglaLimpa,
                 caixa: 300.00,
             }
