@@ -1,10 +1,27 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { PlayersService } from "../players/players.service";
 import { ClubSortOptions, FilterClubDto } from "./dto/filter-club.dto";
 import { ClubMapper } from "./mappers/club.mappers";
-import { compararNomes } from "../../common/utils/string.util";
+import { compararNomes, normalizarTexto } from "../../common/utils/string.util";
 import { PlayerMapper } from "../players/mappers/player.mapper";
+import { CreateClubsDto } from "./dto/create-clubs.dto";
+
+function validarSiglaNoNome(nome: string, sigla: string): boolean {
+    const normNome = normalizarTexto(nome);
+    const normSigla = normalizarTexto(sigla);
+
+    if (normNome[0] !== normSigla[0]) return false;
+
+    let pos = 0;
+    for (const char of normNome) {
+        if (char === normSigla[pos]) {
+            pos++;
+            if (pos === normSigla.length) return true;
+        }
+    }
+    return false;
+}
 
 @Injectable()
 export class ClubsService {
@@ -102,5 +119,60 @@ export class ClubsService {
         const sortedPlayers = this.ordenarElenco(mappedPlayers);
 
         return ClubMapper.toDetailResponse(clube, squadValue, sortedPlayers);
+    }
+
+    async create(dto: CreateClubsDto) {
+        const nomeLimpo = dto.name.trim().replace(/\s+/g, ' ');
+        const siglaLimpa = dto.acronym.trim().toUpperCase();
+
+        if (nomeLimpo === '' || siglaLimpa === '') {
+            throw new BadRequestException({ message: `Nome ou sigla não podem ser vazios` });
+        }
+        const palavras = nomeLimpo.split(' ');
+        if (palavras.length < 2 || palavras.length > 5) {
+            throw new BadRequestException({ message: `Nome deve ter entre 2 e 5 palavras` });
+        }
+        if (nomeLimpo.length < 3 || nomeLimpo.length > 60) {
+            throw new BadRequestException({ message: `Nome deve ter entre 3 e 60 caracteres` });
+        }
+        if (siglaLimpa[0] === siglaLimpa[1] && siglaLimpa[1] === siglaLimpa[2]) {
+            throw new BadRequestException({ message: `Sigla não pode ter todas as letras iguais` });
+        }
+        if (siglaLimpa.length !== 3) {
+            throw new BadRequestException({ message: `Sigla deve ter exatamente 3 caracteres` });
+        }
+        if(!validarSiglaNoNome(nomeLimpo, siglaLimpa)) {
+            throw new BadRequestException({ message: `As letras da sigla devem aparecer no nome do clube na mesma ordem.` });
+        }
+
+        const totalClubes = await this.prisma.clubes.count();
+        if (totalClubes >= 20) {
+            throw new ConflictException({ message: `O limite de 20 clubes por liga foi atingido` });
+        }
+
+        const existingClub = await this.prisma.clubes.findFirst({
+            where: {
+                OR: [
+                    { nome: { equals: nomeLimpo, mode: 'insensitive' } },
+                    { sigla: { equals: siglaLimpa, mode: 'insensitive' } }
+                ]
+            }
+        })
+        if (existingClub) {
+            if (existingClub.sigla === siglaLimpa) {
+                throw new ConflictException({ message: `Clube com sigla ${dto.acronym} já existe` });
+            }
+            throw new ConflictException({ message: `Clube com nome ${dto.name} já existe` });
+        }
+
+        const newClub = await this.prisma.clubes.create({
+            data: {
+                nome: nomeLimpo,
+                sigla: siglaLimpa,
+                caixa: 300.00,
+            }
+        });
+
+        return ClubMapper.toResponse(newClub, 0);
     }
 }
