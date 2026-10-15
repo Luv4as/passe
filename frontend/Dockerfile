@@ -19,6 +19,6 @@ COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
 COPY --from=build /app/next.config.ts ./next.config.ts
 
-EXPOSE 3000
+EXPOSE 5173
 
 CMD ["npm", "run", "start"]

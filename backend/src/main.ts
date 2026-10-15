@@ -16,7 +16,7 @@ async function bootstrap() {
     }),
   );
   
-  const port = process.env.PORT ?? 3000; //era 5173
+  const port = process.env.PORT ?? 3000;
   await app.listen(port)
 }
 void bootstrap();
