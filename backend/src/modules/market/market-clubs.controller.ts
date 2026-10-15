@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Query, Res } from "@nestjs/common";
+import express from 'express';
 import { MarketService } from "./market.service";
 import { ParseIdPipe } from "../../common/pipes/parse-id.pipe";
 import { GetTransactionsQueryDto } from "./dto/get-transactions-query.dto";
@@ -18,8 +19,14 @@ export class MarketClubsController {
     @Get(':id/transactions/export')
     async exportTransactionsCsv(
         @Param('id', ParseIdPipe) clubId: number,
-        @Res() res: Response,
+        @Query() query: GetTransactionsQueryDto,
+        @Res() res: express.Response,
     ) {
-        return 'csvStream.pipe(res)';
+        const csvData = await this.marketService.exportTransactionsCsv(clubId, query);
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename=transactions_${clubId}.csv`);
+
+        return res.send(csvData);
     }
 }

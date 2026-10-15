@@ -4,6 +4,7 @@ import { TransactionMapper } from "./mappers/market.mapper";
 import { BuyPlayerDto } from "./dto/buy-player.dto";
 import { calcularValorMercado } from "../../common/utils/player.utils";
 import { GetTransactionsQueryDto } from "./dto/get-transactions-query.dto";
+import { generateTransactionsCsv } from "../../common/utils/csv.utils";
 
 @Injectable()
 export class MarketService {
@@ -285,7 +286,7 @@ export class MarketService {
 
             return acc;
         },
-        {
+            {
                 total_spent: 0,
                 total_received: 0,
                 total_fees: 0,
@@ -294,5 +295,44 @@ export class MarketService {
             }
         );
         return TransactionMapper.toTransactionsResponse(transactions, summary);
+    }
+
+    async exportTransactionsCsv(clubId: number, query: GetTransactionsQueryDto): Promise<string> {
+
+        const club = await this.prisma.clubes.findUnique({
+            where: { id: clubId },
+        });
+        if (!club) {
+            throw new NotFoundException({ message: `Clube com ID ${clubId} não encontrado.` });
+        }
+
+        if (query.player_id) {
+            const player = await this.prisma.jogadores.findFirst({
+                where: { id: query.player_id, excluido_em: null },
+            });
+            if (!player) {
+                throw new NotFoundException({ message: `Jogador com ID ${query.player_id} não encontrado.` });
+            }
+        }
+
+        const where: any = { clube_id: clubId };
+
+        if (query.type) {
+            const types = query.type.split(',');
+            where.tipo = { in: types };
+        }
+
+        if (query.player_id) {
+            where.jogador_id = query.player_id;
+        }
+
+        const transactions = await this.prisma.transacoes.findMany({
+            where, orderBy: [
+                { criado_em: 'desc' },
+                { id: 'desc' }
+            ]
+        });
+
+        return generateTransactionsCsv(transactions);
     }
 }
