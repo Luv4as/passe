@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Query, Res } from "@nestjs/common";
 import { MarketService } from "./market.service";
 import { ParseIdPipe } from "../../common/pipes/parse-id.pipe";
+import { GetTransactionsQueryDto } from "./dto/get-transactions-query.dto";
 
 @Controller('clubs')
 export class MarketClubsController {
@@ -9,10 +10,9 @@ export class MarketClubsController {
     @Get(':id/transactions')
     async getTransactions(
         @Param('id', ParseIdPipe) clubId: number,
-        @Query('page') page?: number,
-        @Query('limit') limit?: number,
+        @Query() query: GetTransactionsQueryDto,
     ) {
-        return 'this.marketService.getClubTransactions(clubId, page, limit)';
+        return this.marketService.getClubTransactions(clubId, query);
     }
 
     @Get(':id/transactions/export')

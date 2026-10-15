@@ -3,6 +3,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { TransactionMapper } from "./mappers/market.mapper";
 import { BuyPlayerDto } from "./dto/buy-player.dto";
 import { calcularValorMercado } from "../../common/utils/player.utils";
+import { GetTransactionsQueryDto } from "./dto/get-transactions-query.dto";
 
 @Injectable()
 export class MarketService {
@@ -228,5 +229,70 @@ export class MarketService {
             resultado.contrato,
             resultado.newCash,
         );
+    }
+
+    async getClubTransactions(clubId: number, query: GetTransactionsQueryDto) {
+        const club = await this.prisma.clubes.findUnique({
+            where: { id: clubId },
+        });
+        if (!club) {
+            throw new NotFoundException({ message: `Clube com ID:${clubId} não encontrado.` });
+        }
+
+        if (query.player_id) {
+            const player = await this.prisma.jogadores.findFirst({
+                where: { id: query.player_id, excluido_em: null },
+            });
+            if (!player) {
+                throw new NotFoundException({ message: `Jogador com ID:${query.player_id} não encontrado.` });
+            }
+        }
+
+        const where: any = { clube_id: clubId };
+        if (query.type) {
+            const types = query.type.split(',');
+            where.tipo = { in: types };
+        }
+
+        if (query.player_id) {
+            where.jogador_id = query.player_id;
+        }
+
+        const transactions = await this.prisma.transacoes.findMany({
+            where,
+            orderBy: [
+                { criado_em: 'desc' },
+                { id: 'desc' }
+            ],
+        });
+
+        const summary = transactions.reduce((acc, t) => {
+            const val = Number(t.valor);
+            const fee = Number(t.taxa);
+            const penalty = Number(t.multa);
+            const profit = t.lucro !== null ? Number(t.lucro) : 0;
+            const cashChange = Number(t.variacao_caixa);
+
+            if (t.tipo === 'COMPRA') {
+                acc.total_spent += val + fee;
+            } else if (t.tipo === 'VENDA') {
+                acc.total_received += cashChange;
+                acc.total_profit += profit;
+            }
+
+            acc.total_fees += fee;
+            acc.total_penalties += penalty;
+
+            return acc;
+        },
+        {
+                total_spent: 0,
+                total_received: 0,
+                total_fees: 0,
+                total_penalties: 0,
+                total_profit: 0,
+            }
+        );
+        return TransactionMapper.toTransactionsResponse(transactions, summary);
     }
 }

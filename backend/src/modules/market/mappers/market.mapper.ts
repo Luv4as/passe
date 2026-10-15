@@ -1,4 +1,32 @@
 export class TransactionMapper {
+    static toTransactionItem(t: any) {
+        return {
+            id: t.id,
+            club_id: t.clube_id,
+            player_id: t.jogador_id,
+            player_name: t.nome_jogador,
+            type: t.tipo,
+            value: Number(t.valor),
+            fee: Number(t.taxa),
+            penalty: Number(t.multa),
+            profit: t.lucro !== null ? Number(t.lucro) : null,
+            cash_change: Number(t.variacao_caixa),
+            created_at: t.criado_em,
+        };
+    }
+
+    static toTransactionsResponse(transactions: any[], summaryData: any) {
+        return {
+            data: transactions.map((t) => this.toTransactionItem(t)),
+            summary: {
+                total_spent: Number(summaryData.total_spent.toFixed(2)),
+                total_received: Number(summaryData.total_received.toFixed(2)),
+                total_fees: Number(summaryData.total_fees.toFixed(2)),
+                total_penalties: Number(summaryData.total_penalties.toFixed(2)),
+                total_profit: Number(summaryData.total_profit.toFixed(2)),
+            },
+        };
+    }
 
     static toResponse(transaction: any, contract: any, clubCash: number) {
         return {
