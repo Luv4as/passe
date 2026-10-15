@@ -4,7 +4,7 @@ import { ParseIdPipe } from "../../common/pipes/parse-id.pipe";
 import { BuyPlayerDto } from "./dto/buy-player.dto";
 
 @Controller('players')
-export class MarketController {
+export class MarketPlayersController {
     constructor(private readonly marketService: MarketService) { }
     
     @Post(':id/buy')
