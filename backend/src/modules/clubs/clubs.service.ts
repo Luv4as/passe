@@ -6,6 +6,7 @@ import { ClubMapper } from "./mappers/club.mappers";
 import { compararNomes, normalizarTexto } from "../../common/utils/string.util";
 import { PlayerMapper } from "../players/mappers/player.mapper";
 import { CreateClubsDto } from "./dto/create-clubs.dto";
+import { calcularValorMercado } from "../../common/utils/player.utils";
 
 function validarSiglaNoNome(nome: string, sigla: string): boolean {
     const normNome = normalizarTexto(nome);
@@ -56,7 +57,7 @@ export class ClubsService {
 
         let mapped = clubes.map((c) => {
             const squadValue = c.jogadores.reduce((total, jogador) => {
-                const marketValue = this.playerService.calcularValorMercado(jogador);
+                const marketValue = calcularValorMercado(jogador);
                 return total + marketValue;
             }, 0);
 
@@ -109,7 +110,7 @@ export class ClubsService {
         let squadValue = 0;
 
         const mappedPlayers = clube.jogadores.map((jogador) => {
-            const marketValue = this.playerService.calcularValorMercado(jogador);
+            const marketValue = calcularValorMercado(jogador);
             const overall = this.playerService.calcularOverall(jogador);
             squadValue += marketValue;
 

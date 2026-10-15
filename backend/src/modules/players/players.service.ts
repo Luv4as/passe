@@ -7,6 +7,7 @@ import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerMapper } from './mappers/player.mapper';
 import { FilterPlayerDto } from './dto/filter-player.dto';
 import { compararNomes, normalizarTexto } from '../../common/utils/string.util';
+import { calcularValorMercado } from '../../common/utils/player.utils';
 
 const PESOS_POSICAO: Record<string, Record<string, number>> = {
     GOL: { velocidade: 0.10, finalizacao: 0.00, passe: 0.20, drible: 0.00, defesa: 0.40, fisico: 0.30 },
@@ -98,38 +99,6 @@ export class PlayersService {
         return Number(valorBase.toFixed(2));
     }
 
-    public calcularValorMercado(player: any): number {
-        const valorBase = Number(player.valor_base);
-        let descontoCondicao = 0;
-
-        if (player.condicao !== 'APTO') {
-            descontoCondicao = player.condicao === 'MAL_CONDICIONADO' ? 15 : 30;
-            if (player.agilidade >= 80) descontoCondicao /= 2;
-            else if (player.agilidade <= 30) descontoCondicao += 10;
-        }
-
-        const idade = player.age ?? player.idade ?? 0;
-
-        let ajusteIdade = 0;
-        if (idade <= 21) {
-            ajusteIdade = 10;
-        } else if (idade >= 32) {
-            ajusteIdade = -10;
-        }
-
-        let percDescontoTotal = ajusteIdade - descontoCondicao;
-        if (percDescontoTotal < -40) {
-            percDescontoTotal = -40;
-        }
-
-        let valorMercado = valorBase * ((100 + percDescontoTotal) / 100);
-        if (valorMercado < 1.0) {
-            valorMercado = 1.0;
-        }
-
-        return Number(valorMercado.toFixed(2));
-    }
-
     async create(dto: CreatePlayerDto) {
         const atributos = [
             dto.pace,
@@ -190,7 +159,7 @@ export class PlayersService {
         });
 
         const overall = this.calcularOverall(player);
-        const marketValue = this.calcularValorMercado(player);
+        const marketValue = calcularValorMercado(player);
 
         return PlayerMapper.toResponse(player, overall, marketValue);
     }
@@ -245,7 +214,7 @@ export class PlayersService {
 
         let mapped = players.map((p) => {
             const overall = this.calcularOverall(p);
-            const marketValue = this.calcularValorMercado(p);
+            const marketValue = calcularValorMercado(p);
             return PlayerMapper.toResponse(p, overall, marketValue);
         })
 
@@ -287,7 +256,7 @@ export class PlayersService {
         }
 
         const overall = this.calcularOverall(player);
-        const marketValue = this.calcularValorMercado(player);
+        const marketValue = calcularValorMercado(player);
         return PlayerMapper.toResponse(player, overall, marketValue);
     }
 
@@ -323,7 +292,7 @@ export class PlayersService {
         });
 
         const overall = this.calcularOverall(updated);
-        const marketValue = this.calcularValorMercado(updated);
+        const marketValue = calcularValorMercado(updated);
 
         return PlayerMapper.toResponse(updated, overall, marketValue);
     }
@@ -356,7 +325,7 @@ export class PlayersService {
             });
         });
         const overall = this.calcularOverall(updated);
-        const marketValue = this.calcularValorMercado(updated);
+        const marketValue = calcularValorMercado(updated);
 
         return PlayerMapper.toResponse(updated, overall, marketValue);
     }
