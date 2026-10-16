@@ -17,7 +17,9 @@ export const metadata: Metadata = {
   description: "Gestão da liga, do mercado à classificação",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="pt-br"
