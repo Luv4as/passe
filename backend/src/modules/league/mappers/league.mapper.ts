@@ -38,4 +38,49 @@ export class LeagueMapper {
             players: players.map((p) => this.toPlayerItem(p)),
         }
     }
+
+    static toMatchResponse(partida: any, homeClub: any, awayClub: any, duelos: any[]) {
+        return {
+            id: partida.id,
+            played_at: partida.jogada_em,
+            home: {
+                club_id: homeClub.id,
+                club_name: homeClub.nome,
+                formation: partida.formacao_mandante,
+                goals: partida.gols_mandante,
+            },
+            away: {
+                club_id: awayClub.id,
+                club_name: awayClub.nome,
+                formation: partida.formacao_visitante,
+                goals: partida.gols_visitante,
+            },
+            result: partida.gols_mandante > partida.gols_visitante
+                ? 'MANDANTE'
+                : partida.gols_visitante > partida.gols_mandante
+                    ? 'VISITANTE'
+                    : 'EMPATE',
+            duels: duelos.map((d) => ({
+                order: d.ordem,
+                attacking_club_id: d.clube_atacante_id,
+                attacker: {
+                    player_id: d.atacante_id,
+                    player_name: d.nome_atacante,
+                    position: d.posicao_atacante,
+                    condition: d.condicao_atacante,
+                    attribute: d.atributo_ataque,
+                    value: d.valor_ataque,
+                },
+                defender: {
+                    player_id: d.defensor_id,
+                    player_name: d.nome_defensor,
+                    position: d.posicao_defensor,
+                    condition: d.condicao_defensor,
+                    attribute: d.atributo_defesa,
+                    value: d.valor_defesa,
+                },
+                goal: d.gol,
+            })),
+        };
+    }
 }
