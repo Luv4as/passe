@@ -4,6 +4,7 @@ import { SetLineupDto } from "./dto/set-lineup.dto";
 import { LeagueMapper } from "./mappers/league.mapper";
 import { CreateMatchDto } from "./dto/create-match.dto";
 import { GetMatchesQueryDto } from "./dto/get-matches-query.dto";
+import { normalizarTexto } from "../../common/utils/string.util";
 
 @Injectable()
 export class LeagueService {
@@ -81,6 +82,21 @@ export class LeagueService {
         if (posicao === 'ATA') return { nome: 'shooting', campoPrisma: 'finalizacao' };
         if (posicao === 'MEI') return { nome: 'passing', campoPrisma: 'passe' };
         return { nome: 'dribbling', campoPrisma: 'drible' }; // ZAG e LAT
+    }
+
+    private ordenarTabelaStandings(tabela: any[]) {
+        return tabela.sort((a, b) => {
+            if (b.points !== a.points) return b.points - a.points;
+            if (b.victories !== a.victories) return b.victories - a.victories;
+            if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
+            if (b.goals_for !== a.goals_for) return b.goals_for - a.goals_for;
+
+            const nomeA = normalizarTexto(a.club_name);
+            const nomeB = normalizarTexto(b.club_name);
+            if (nomeA !== nomeB) return nomeA < nomeB ? -1 : 1;
+
+            return a.club_id - b.club_id;
+        });
     }
 
     private async obterTitularesValidos(clubId: number) {
@@ -220,7 +236,7 @@ export class LeagueService {
         if (dto.home_club_id === dto.away_club_id) {
             throw new BadRequestException({ message: 'O clube da casa e o clube visitante não podem ser o mesmo.' });
         }
-        
+
         const homeClubData = await this.obterTitularesValidos(dto.home_club_id);
         const awayClubData = await this.obterTitularesValidos(dto.away_club_id);
 
@@ -356,5 +372,76 @@ export class LeagueService {
         }
 
         return LeagueMapper.toMatchDetailResponse(partida);
+    }
+
+    async getStandings() {
+        const clubs = await this.prisma.clubes.findMany({
+            include: {
+                partidas_mandante: true,
+                partidas_visitante: true,
+            },
+        });
+
+        const tabela = clubs.map((c) => {
+            let points = 0;
+            let victories = 0;
+            let draws = 0;
+            let defeats = 0;
+            let goals_for = 0;
+            let goals_against = 0;
+
+            c.partidas_mandante.forEach((p) => {
+                goals_for += p.gols_mandante;
+                goals_against += p.gols_visitante;
+
+                if (p.gols_mandante > p.gols_visitante) {
+                    points += 3;
+                    victories += 1;
+                } else if (p.gols_mandante === p.gols_visitante) {
+                    points += 1;
+                    draws += 1;
+                } else {
+                    defeats += 1;
+                }
+            });
+
+            c.partidas_visitante.forEach((p => {
+                goals_for += p.gols_visitante;
+                goals_against += p.gols_mandante;
+
+                if (p.gols_visitante > p.gols_mandante) {
+                    points += 3;
+                    victories += 1;
+                } else if (p.gols_visitante === p.gols_mandante) {
+                    points += 1;
+                    draws += 1;
+                } else {
+                    defeats += 1;
+                }
+            }));
+
+            const played = victories + draws + defeats;
+            const goal_difference = goals_for - goals_against;
+
+            return {
+                club_id: c.id,
+                club_name: c.nome,
+                points,
+                played,
+                victories,
+                draws,
+                defeats,
+                goals_for,
+                goals_against,
+                goal_difference
+            };
+        });
+
+        const tabelaOrdenada = this.ordenarTabelaStandings(tabela);
+
+        return tabelaOrdenada.map((item, index) => ({
+            ...item,
+            position: index + 1,
+        }));
     }
 }

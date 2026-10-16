@@ -140,4 +140,20 @@ export class LeagueMapper {
         };
     }
 
+    static toStandingItem(item: any) {
+        return {
+            position: item.position,
+            club_id: item.club_id,
+            club_name: item.club_name,
+            points: item.points,
+            played: item.played,
+            victories: item.victories,
+            draws: item.draws,
+            defeats: item.defeats,
+            goals_for: item.goals_for,
+            goals_against: item.goals_against,
+            goal_difference: item.goal_difference,
+        };
+    }
+
 }
