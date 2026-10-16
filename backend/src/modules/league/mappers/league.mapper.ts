@@ -25,7 +25,7 @@ export class LeagueMapper {
 
     static toLineupResponse(params: {
         clubId: number;
-        formation: string;
+        formation: string | null;
         complete: boolean;
         players: any[];
     }) {

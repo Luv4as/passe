@@ -62,7 +62,7 @@ export class LeagueService {
 
             const nomeA = a.nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
             const nomeB = b.nome.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-            if (nomeA !== nomeB) return nomeA.localeCompare(nomeB);
+            if (nomeA !== nomeB) return nomeA < nomeB ? -1 : 1;
 
             return a.id - b.id;
         });
@@ -84,7 +84,7 @@ export class LeagueService {
             }
         });
         if (players.length !== 5) {
-            throw new ConflictException({ message: 'A escalação deve conter exatamente 5 jogadores válidos.' });
+            throw new NotFoundException({ message: 'A escalação deve conter exatamente 5 jogadores válidos.' });
         }
 
         const foraDoElenco = players.some((p) => p.clube_id !== clubId);
@@ -125,6 +125,44 @@ export class LeagueService {
             clubId,
             formation: dto.formation,
             complete: true,
+            players: jogadoresOrdenados,
+        });
+    }
+
+    async getLineup(clubId: number) {
+        const club = await this.prisma.clubes.findUnique({
+            where: { id: clubId },
+            include: {
+                escalacoes: {
+                    include: {
+                        jogador: true,
+                    }
+                }
+            }
+        })
+        if (!club) {
+            throw new NotFoundException({ message: `Clube com ID:${clubId} não encontrado.` });
+        }
+
+        if (!club.formacao || club.escalacoes.length === 0) {
+            return LeagueMapper.toLineupResponse({
+                clubId,
+                formation: null,
+                complete: false,
+                players: [],
+            });
+        }
+
+        const titularesValidos = club.escalacoes.map((e) => e.jogador).filter((j) => j.excluido_em === null && j.clube_id === clubId && j.condicao !== 'DOENTE');
+
+        const complete = titularesValidos.length === 5;
+
+        const jogadoresOrdenados = this.ordenarElenco(titularesValidos);
+
+        return LeagueMapper.toLineupResponse({
+            clubId,
+            formation: club.formacao,
+            complete,
             players: jogadoresOrdenados,
         });
     }

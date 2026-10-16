@@ -19,6 +19,6 @@ export class LeagueClubsController {
     async getLineup(
         @Param('id', ParseIdPipe) clubId: number
     ) {
-        return;
+        return this.leagueService.getLineup(clubId);
     }
 }
