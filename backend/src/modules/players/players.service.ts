@@ -7,15 +7,9 @@ import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerMapper } from './mappers/player.mapper';
 import { FilterPlayerDto } from './dto/filter-player.dto';
 import { compararNomes, normalizarTexto } from '../../common/utils/string.util';
-import { calcularValorMercado } from '../../common/utils/player.utils';
+import { calcularValorMercado, calcularOverall } from '../../common/utils/player.utils';
 
-const PESOS_POSICAO: Record<string, Record<string, number>> = {
-    GOL: { velocidade: 0.10, finalizacao: 0.00, passe: 0.20, drible: 0.00, defesa: 0.40, fisico: 0.30 },
-    ZAG: { velocidade: 0.10, finalizacao: 0.00, passe: 0.15, drible: 0.00, defesa: 0.45, fisico: 0.30 },
-    LAT: { velocidade: 0.25, finalizacao: 0.00, passe: 0.20, drible: 0.15, defesa: 0.25, fisico: 0.15 },
-    MEI: { velocidade: 0.10, finalizacao: 0.15, passe: 0.35, drible: 0.25, defesa: 0.05, fisico: 0.10 },
-    ATA: { velocidade: 0.20, finalizacao: 0.40, passe: 0.10, drible: 0.20, defesa: 0.00, fisico: 0.10 },
-};
+
 
 function ordenarJogadores(mapped: any[], sortOption: string = 'name'): any[] {
     const posOrder: Record<string, number> = { GOL: 1, ZAG: 2, LAT: 3, MEI: 4, ATA: 5 };
@@ -48,33 +42,10 @@ function ordenarJogadores(mapped: any[], sortOption: string = 'name'): any[] {
 export class PlayersService {
     constructor(private readonly prisma: PrismaService) { }
 
-    public calcularOverall(player: any): number {
-        const posicao = player.position ?? player.posicao ?? '';
-        const velocidade = player.pace ?? player.velocidade ?? 0;
-        const finalizacao = player.shooting ?? player.finalizacao ?? 0;
-        const passe = player.passing ?? player.passe ?? 0;
-        const drible = player.dribbling ?? player.drible ?? 0;
-        const defesa = player.defending ?? player.defesa ?? 0;
-        const fisico = player.physical ?? player.fisico ?? 0;
-        const pesos = PESOS_POSICAO[posicao];
 
-        if (!pesos) {
-            throw new BadRequestException({ message: `Posição inválida: ${player.posicao}` });
-        }
-
-        const somaProdutos =
-            velocidade * pesos.velocidade +
-            finalizacao * pesos.finalizacao +
-            passe * pesos.passe +
-            drible * pesos.drible +
-            defesa * pesos.defesa +
-            fisico * pesos.fisico;
-
-        return Math.round(somaProdutos);
-    }
 
     private calcularValorBase(dto: CreatePlayerDto): number {
-        const overall = this.calcularOverall(dto);
+        const overall = calcularOverall(dto);
 
         let parteOverall = 0;
         if (overall > 40) {
@@ -142,7 +113,7 @@ export class PlayersService {
 
         const player = await this.prisma.jogadores.create({
             data: {
-                nome: dto.name,
+                nome: nomeLimpo,
                 idade: dto.age,
                 posicao: dto.position,
                 agilidade: dto.agility,
@@ -158,7 +129,7 @@ export class PlayersService {
             },
         });
 
-        const overall = this.calcularOverall(player);
+        const overall = calcularOverall(player);
         const marketValue = calcularValorMercado(player);
 
         return PlayerMapper.toResponse(player, overall, marketValue);
@@ -213,7 +184,7 @@ export class PlayersService {
         }
 
         let mapped = players.map((p) => {
-            const overall = this.calcularOverall(p);
+            const overall = calcularOverall(p);
             const marketValue = calcularValorMercado(p);
             return PlayerMapper.toResponse(p, overall, marketValue);
         })
@@ -255,7 +226,7 @@ export class PlayersService {
             throw new NotFoundException({ message: `Jogador com id ${id} não encontrado` });
         }
 
-        const overall = this.calcularOverall(player);
+        const overall = calcularOverall(player);
         const marketValue = calcularValorMercado(player);
         return PlayerMapper.toResponse(player, overall, marketValue);
     }
@@ -281,17 +252,28 @@ export class PlayersService {
             throw new BadRequestException({ message: `Jogadores com 35 anos ou mais não podem ter agilidade superior a 85. Idade atual: ${dto.age}, agilidade fornecida: ${dto.agility}` });
         }
 
+        const nomeLimpo = dto.name.trim().replace(/\s+/g, ' ');
+        const palavras = nomeLimpo.split(' ');
+
+        if (palavras.length < 2) {
+            throw new BadRequestException({ message: 'O nome do jogador deve conter pelo menos duas palavras.' });
+        }
+
+        if (/\d/.test(nomeLimpo)) {
+            throw new BadRequestException({ message: 'O nome do jogador não pode conter números.' });
+        }
+
         const updated = await this.prisma.jogadores.update({
             where: { id },
             data: {
-                nome: dto.name,
+                nome: nomeLimpo,
                 idade: dto.age,
                 posicao: dto.position,
                 agilidade: dto.agility,
             },
         });
 
-        const overall = this.calcularOverall(updated);
+        const overall = calcularOverall(updated);
         const marketValue = calcularValorMercado(updated);
 
         return PlayerMapper.toResponse(updated, overall, marketValue);
@@ -324,7 +306,7 @@ export class PlayersService {
                 },
             });
         });
-        const overall = this.calcularOverall(updated);
+        const overall = calcularOverall(updated);
         const marketValue = calcularValorMercado(updated);
 
         return PlayerMapper.toResponse(updated, overall, marketValue);

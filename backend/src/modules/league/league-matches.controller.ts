@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Query, Res } from "@nestjs/common";
+import type { Response } from 'express';
 import { CreateMatchDto } from "./dto/create-match.dto";
 import { LeagueService } from "./league.service";
 import { ParseIdPipe } from "../../common/pipes/parse-id.pipe";
@@ -10,9 +11,12 @@ export class LeagueMatchesController {
 
     @Post()
     async createMatch(
-        @Body() dto: CreateMatchDto
+        @Body() dto: CreateMatchDto,
+        @Res({ passthrough: true }) res: Response
     ) {
-        return await this.leagueService.createMatch(dto);
+        const match = await this.leagueService.createMatch(dto);
+        res.setHeader('Location', `/matches/${match.id}`);
+        return match;
     }
 
     @Get()

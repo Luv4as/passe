@@ -87,9 +87,9 @@ export class LeagueService {
     private ordenarTabelaStandings(tabela: any[]) {
         return tabela.sort((a, b) => {
             if (b.points !== a.points) return b.points - a.points;
-            if (b.victories !== a.victories) return b.victories - a.victories;
             if (b.goal_difference !== a.goal_difference) return b.goal_difference - a.goal_difference;
             if (b.goals_for !== a.goals_for) return b.goals_for - a.goals_for;
+            if (b.wins !== a.wins) return b.wins - a.wins;
 
             const nomeA = normalizarTexto(a.club_name);
             const nomeB = normalizarTexto(b.club_name);
@@ -384,9 +384,9 @@ export class LeagueService {
 
         const tabela = clubs.map((c) => {
             let points = 0;
-            let victories = 0;
+            let wins = 0;
             let draws = 0;
-            let defeats = 0;
+            let losses = 0;
             let goals_for = 0;
             let goals_against = 0;
 
@@ -396,31 +396,31 @@ export class LeagueService {
 
                 if (p.gols_mandante > p.gols_visitante) {
                     points += 3;
-                    victories += 1;
+                    wins += 1;
                 } else if (p.gols_mandante === p.gols_visitante) {
                     points += 1;
                     draws += 1;
                 } else {
-                    defeats += 1;
+                    losses += 1;
                 }
             });
 
-            c.partidas_visitante.forEach((p => {
+            c.partidas_visitante.forEach((p) => {
                 goals_for += p.gols_visitante;
                 goals_against += p.gols_mandante;
 
                 if (p.gols_visitante > p.gols_mandante) {
                     points += 3;
-                    victories += 1;
+                    wins += 1;
                 } else if (p.gols_visitante === p.gols_mandante) {
                     points += 1;
                     draws += 1;
                 } else {
-                    defeats += 1;
+                    losses += 1;
                 }
-            }));
+            });
 
-            const played = victories + draws + defeats;
+            const played = wins + draws + losses;
             const goal_difference = goals_for - goals_against;
 
             return {
@@ -428,9 +428,9 @@ export class LeagueService {
                 club_name: c.nome,
                 points,
                 played,
-                victories,
+                wins,
                 draws,
-                defeats,
+                losses,
                 goals_for,
                 goals_against,
                 goal_difference
@@ -439,9 +439,9 @@ export class LeagueService {
 
         const tabelaOrdenada = this.ordenarTabelaStandings(tabela);
 
-        return tabelaOrdenada.map((item, index) => ({
+        return tabelaOrdenada.map((item, index) => LeagueMapper.toStandingItem({
             ...item,
-            position: index + 1,
+            position: index + 1
         }));
     }
 }

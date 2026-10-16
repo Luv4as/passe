@@ -1,9 +1,17 @@
 // src/modules/players/dto/create-player.dto.ts
-import { IsDecimal, IsEnum, IsInt, IsNotEmpty, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsEnum, IsInt, IsNotEmpty, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 
 export class CreatePlayerDto {
     @IsString()
     @IsNotEmpty()
+    @Transform(({ value }) => {
+        if (typeof value !== 'string') return value;
+        return value
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+            .trim()
+            .replace(/\s+/g, ' ');
+    })
     @MinLength(3, { message: 'name deve ter no mínimo 3 caracteres' })
     @MaxLength(100, { message: 'name deve ter no máximo 100 caracteres' })
     name: string;

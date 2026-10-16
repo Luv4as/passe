@@ -6,7 +6,7 @@ import { ClubMapper } from "./mappers/club.mappers";
 import { compararNomes, normalizarTexto } from "../../common/utils/string.util";
 import { PlayerMapper } from "../players/mappers/player.mapper";
 import { CreateClubsDto } from "./dto/create-clubs.dto";
-import { calcularValorMercado } from "../../common/utils/player.utils";
+import { calcularOverall, calcularValorMercado } from "../../common/utils/player.utils";
 
 function validarSiglaNoNome(nome: string, sigla: string): boolean {
     const normNome = normalizarTexto(nome);
@@ -111,7 +111,7 @@ export class ClubsService {
 
         const mappedPlayers = clube.jogadores.map((jogador) => {
             const marketValue = calcularValorMercado(jogador);
-            const overall = this.playerService.calcularOverall(jogador);
+            const overall = calcularOverall(jogador);
             squadValue += marketValue;
 
             return PlayerMapper.toSquadPlayerResponse(jogador, overall, marketValue, clube.id);
@@ -151,31 +151,40 @@ export class ClubsService {
             throw new ConflictException({ message: `O limite de 20 clubes por liga foi atingido` });
         }
 
-        const existingClub = await this.prisma.clubes.findFirst({
-            where: {
-                OR: [
-                    { nome: { equals: nomeLimpo, mode: 'insensitive' } },
-                    { sigla: { equals: siglaLimpa, mode: 'insensitive' } }
-                ]
-            }
+        const clubByNome = await this.prisma.clubes.findUnique({
+            where: { nome: nomeLimpo },
         })
-        if (existingClub) {
-            if (existingClub.sigla === siglaLimpa) {
-                throw new ConflictException({ message: `Clube com sigla ${dto.acronym} já existe` });
-            }
+        if (clubByNome) {
             throw new ConflictException({ message: `Clube com nome ${dto.name} já existe` });
         }
 
-        const nomeNormalizado = normalizarTexto(nomeLimpo);
-        const newClub = await this.prisma.clubes.create({
-            data: {
-                nome: nomeLimpo,
-                nome_normalizado: nomeNormalizado,
-                sigla: siglaLimpa,
-                caixa: 300.00,
-            }
-        });
+        const clubBySigla = await this.prisma.clubes.findUnique({
+            where: { sigla: siglaLimpa },
+        })
+        if (clubBySigla) {
+            throw new ConflictException({ message: `Clube com sigla ${dto.acronym} já existe` });
+        }
 
-        return ClubMapper.toResponse(newClub, 0);
+
+        const nomeNormalizado = normalizarTexto(nomeLimpo);
+        try {
+
+            const newClub = await this.prisma.clubes.create({
+                data: {
+                    nome: nomeLimpo,
+                    nome_normalizado: nomeNormalizado,
+                    sigla: siglaLimpa,
+                    caixa: 300.00,
+                }
+            });
+
+            return ClubMapper.toResponse(newClub, 0);
+        } catch (error: any) {
+
+            if (error.code === 'P2002') {
+                throw new ConflictException({ message: 'Clube com este nome, nome normalizado ou sigla já existe' });
+            }
+            throw error;
+        }
     }
 }

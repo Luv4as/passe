@@ -15,15 +15,15 @@ export class ClubsController {
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIdPipe) id: number) {
-        return this.clubsService.findOne(id);
+    findOne(@Param('id', ParseIdPipe) id: number){
+        return //this.clubsService.findOne(id);
     }
 
     @Post()
     async create(
         @Body() dto: CreateClubsDto,
         @Res({ passthrough: true }) res: Response
-    ) {
+    ){
         const club = await this.clubsService.create(dto);
         res.setHeader('Location', `/clubs/${club.id}`);
         return club;

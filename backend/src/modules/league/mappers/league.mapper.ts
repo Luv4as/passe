@@ -1,8 +1,9 @@
 import { formatBrazilianDate } from "../../../common/utils/csv.utils";
-import { calcularValorMercado } from "../../../common/utils/player.utils";
+import { calcularOverall, calcularValorMercado } from "../../../common/utils/player.utils";
 
 export class LeagueMapper {
     static toPlayerItem(player: any) {
+
         return {
             id: player.id,
             name: player.nome,
@@ -19,7 +20,7 @@ export class LeagueMapper {
             defending: player.defesa,
             physical: player.fisico,
             potential: player.potencial,
-            overall: player.overall,
+            overall: calcularOverall(player),
             club_id: player.clube_id,
         };
     }
@@ -147,9 +148,9 @@ export class LeagueMapper {
             club_name: item.club_name,
             points: item.points,
             played: item.played,
-            victories: item.victories,
+            wins: item.wins,
             draws: item.draws,
-            defeats: item.defeats,
+            losses: item.losses,
             goals_for: item.goals_for,
             goals_against: item.goals_against,
             goal_difference: item.goal_difference,

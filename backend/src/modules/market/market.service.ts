@@ -11,7 +11,7 @@ export class MarketService {
     constructor(private readonly prisma: PrismaService) { }
 
     private validarFidelidade(loyaltyUntil: string): Date {
-        const dateMatch = loyaltyUntil.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?-03:00$/);
+        const dateMatch = loyaltyUntil.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})-03:00$/);
         if (!dateMatch) {
             throw new BadRequestException({ message: 'Formato de data inválido. Use AAAA-MM-DDTHH:MM-03:00.' });
         }
@@ -29,6 +29,12 @@ export class MarketService {
 
         const agora = new Date();
         const fimFidelidade = new Date(loyaltyUntil);
+
+        if (fimFidelidade <= agora) {
+            throw new BadRequestException({
+                message: 'A data de fim de fidelidade deve ser uma data futura válida.',
+            });
+        }
 
         if (isNaN(fimFidelidade.getTime()) || fimFidelidade <= agora) {
             throw new BadRequestException({

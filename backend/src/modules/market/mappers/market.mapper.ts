@@ -1,3 +1,5 @@
+import { formatBrazilianDate } from "../../../common/utils/csv.utils";
+
 export class TransactionMapper {
     static toTransactionItem(t: any) {
         return {
@@ -11,7 +13,7 @@ export class TransactionMapper {
             penalty: Number(t.multa),
             profit: t.lucro !== null ? Number(t.lucro) : null,
             cash_change: Number(t.variacao_caixa),
-            created_at: t.criado_em,
+            created_at: formatBrazilianDate(t.criado_em),
         };
     }
 
@@ -40,10 +42,10 @@ export class TransactionMapper {
             penalty: Number(transaction.multa),
             profit: transaction.lucro !== null ? Number(transaction.lucro) : null,
             cash_change: Number(transaction.variacao_caixa),
-            created_at: transaction.criado_em,
+            created_at: formatBrazilianDate(transaction.criado_em),
             contract: {
                 purchase_value: Number(contract.valor_compra),
-                loyalty_until: contract.fidelidade_ate,
+                loyalty_until: formatBrazilianDate(contract.fidelidade_ate),
                 status: contract.situacao,
             },
             club_cash: Number(clubCash),
@@ -70,7 +72,7 @@ export class TransactionMapper {
             penalty: Number(transaction.multa),
             profit: Number(transaction.lucro),
             cash_change: Number(transaction.variacao_caixa),
-            created_at: transaction.criado_em,
+            created_at: formatBrazilianDate(transaction.criado_em),
             purchase_value: Number(purchaseValue),
             remaining_days: remainingDays,
             penalty_rate: penaltyRate,
