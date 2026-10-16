@@ -3,6 +3,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { SetLineupDto } from "./dto/set-lineup.dto";
 import { LeagueMapper } from "./mappers/league.mapper";
 import { CreateMatchDto } from "./dto/create-match.dto";
+import { GetMatchesQueryDto } from "./dto/get-matches-query.dto";
 
 @Injectable()
 export class LeagueService {
@@ -216,12 +217,13 @@ export class LeagueService {
     }
 
     async createMatch(dto: CreateMatchDto) {
-        const homeClubData = await this.obterTitularesValidos(dto.home_club_id);
-        const awayClubData = await this.obterTitularesValidos(dto.away_club_id);
-
         if (dto.home_club_id === dto.away_club_id) {
             throw new BadRequestException({ message: 'O clube da casa e o clube visitante não podem ser o mesmo.' });
         }
+        
+        const homeClubData = await this.obterTitularesValidos(dto.home_club_id);
+        const awayClubData = await this.obterTitularesValidos(dto.away_club_id);
+
 
         const duelos: any[] = [];
         let golsMandante = 0;
@@ -302,5 +304,57 @@ export class LeagueService {
         });
 
         return LeagueMapper.toMatchResponse(partidaSalva, homeClubData.club, awayClubData.club, duelos);
+    }
+
+    async getMatches(query: GetMatchesQueryDto) {
+        if (query.club_id) {
+            const club = await this.prisma.clubes.findUnique({
+                where: { id: query.club_id },
+            });
+            if (!club) {
+                throw new NotFoundException({ message: `Clube com ID:${query.club_id} não encontrado.` });
+            }
+        }
+
+        const where: any = {};
+        if (query.club_id) {
+            where.OR = [
+                { mandante_id: query.club_id },
+                { visitante_id: query.club_id },
+            ];
+        }
+
+        const partidas = await this.prisma.partidas.findMany({
+            where,
+            include: {
+                mandante: true,
+                visitante: true,
+            },
+            orderBy: [
+                { jogada_em: 'desc' },
+                { id: 'desc' },
+            ],
+        });
+
+        return partidas.map((p) => LeagueMapper.toMatchSummaryItem(p));
+    }
+
+    async getMatchById(id: number) {
+        const partida = await this.prisma.partidas.findUnique({
+            where: { id },
+            include: {
+                mandante: true,
+                visitante: true,
+                partidas_duelos: {
+                    orderBy: { ordem: 'asc' },
+                },
+            },
+        });
+
+        if (!partida) {
+            throw new NotFoundException({ message: `Partida com ID:${id} não encontrada.` });
+        }
+
+        return LeagueMapper.toMatchDetailResponse(partida);
     }
 }

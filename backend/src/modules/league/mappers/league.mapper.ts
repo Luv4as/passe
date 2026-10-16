@@ -1,3 +1,4 @@
+import { formatBrazilianDate } from "../../../common/utils/csv.utils";
 import { calcularValorMercado } from "../../../common/utils/player.utils";
 
 export class LeagueMapper {
@@ -42,7 +43,7 @@ export class LeagueMapper {
     static toMatchResponse(partida: any, homeClub: any, awayClub: any, duelos: any[]) {
         return {
             id: partida.id,
-            played_at: partida.jogada_em,
+            played_at: formatBrazilianDate(partida.jogada_em),
             home: {
                 club_id: homeClub.id,
                 club_name: homeClub.nome,
@@ -83,4 +84,60 @@ export class LeagueMapper {
             })),
         };
     }
+
+    static toMatchSummaryItem(partida: any) {
+        return {
+            id: partida.id,
+            played_at: formatBrazilianDate(partida.jogada_em),
+            home: {
+                club_id: partida.mandante.id,
+                club_name: partida.mandante.nome,
+                formation: partida.formacao_mandante,
+                goals: partida.gols_mandante,
+            },
+            away: {
+                club_id: partida.visitante.id,
+                club_name: partida.visitante.nome,
+                formation: partida.formacao_visitante,
+                goals: partida.gols_visitante,
+            },
+            result:
+                partida.gols_mandante > partida.gols_visitante
+                    ? 'MANDANTE'
+                    : partida.gols_visitante > partida.gols_mandante
+                        ? 'VISITANTE'
+                        : 'EMPATE',
+        };
+    }
+
+    static toMatchDetailResponse(partida: any) {
+
+        const duelosList = partida.partidas_duelos || partida.duelos || [];
+
+        return {
+            ...this.toMatchSummaryItem(partida),
+            duels: duelosList.map((d: any) => ({
+                order: d.ordem,
+                attacking_club_id: d.clube_atacante_id,
+                attacker: {
+                    player_id: d.atacante_id,
+                    player_name: d.nome_atacante,
+                    position: d.posicao_atacante,
+                    condition: d.condicao_atacante,
+                    attribute: d.atributo_ataque,
+                    value: d.valor_ataque,
+                },
+                defender: {
+                    player_id: d.defensor_id,
+                    player_name: d.nome_defensor,
+                    position: d.posicao_defensor,
+                    condition: d.condicao_defensor,
+                    attribute: d.atributo_defesa,
+                    value: d.valor_defesa,
+                },
+                goal: d.gol,
+            })),
+        };
+    }
+
 }

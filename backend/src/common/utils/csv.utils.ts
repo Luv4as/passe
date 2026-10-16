@@ -1,6 +1,6 @@
 import { Parser } from '@json2csv/plainjs';
 
-function formatBrazilianDate(dateInput: Date | string): string {
+export function formatBrazilianDate(dateInput: Date | string): string {
     const date = new Date(dateInput);
     const offsetMs = -3 * 60 * 60 * 1000;
     const localDate = new Date(date.getTime() + offsetMs);
