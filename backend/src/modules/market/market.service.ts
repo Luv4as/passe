@@ -11,6 +11,22 @@ export class MarketService {
     constructor(private readonly prisma: PrismaService) { }
 
     private validarFidelidade(loyaltyUntil: string): Date {
+        const dateMatch = loyaltyUntil.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?-03:00$/);
+        if (!dateMatch) {
+            throw new BadRequestException({ message: 'Formato de data inválido. Use AAAA-MM-DDTHH:MM-03:00.' });
+        }
+
+        const [, year, month, day, hour, minute] = dateMatch.map(Number);
+        const testDate = new Date(Date.UTC(year, month - 1, day, hour + 3, minute));
+
+        if (
+            testDate.getUTCFullYear() !== year ||
+            testDate.getUTCMonth() !== month - 1 ||
+            testDate.getUTCDate() !== day
+        ) {
+            throw new BadRequestException({ message: 'A data/hora informada não existe no calendário.' });
+        }
+
         const agora = new Date();
         const fimFidelidade = new Date(loyaltyUntil);
 
@@ -28,30 +44,6 @@ export class MarketService {
         }
 
         return fimFidelidade;
-    }
-
-    private async validarElegibilidadeCompra(player: any, clubId: number) {
-        if (player.clube_id !== null) {
-            throw new ConflictException({ message: `O jogador já está vinculado a um clube. Clube atual: ${player.clube_id}` });
-        }
-
-        const totalElenco = await this.prisma.jogadores.count({
-            where: { clube_id: clubId, excluido_em: null },
-        });
-
-        if (totalElenco >= 12) {
-            throw new ConflictException({ message: 'O clube já atingiu o limite de 12 jogadores no elenco.' });
-        }
-
-        const jaVendeu = await this.prisma.transacoes.findFirst({
-            where: { clube_id: clubId, jogador_id: player.id, tipo: 'VENDA' },
-        });
-
-        if (jaVendeu) {
-            throw new ConflictException({
-                message: 'O clube não pode comprar um jogador que ele mesmo já vendeu anteriormente.',
-            });
-        }
     }
 
     private calcularCustosCompra(marketValue: number, caixaAtual: number) {
@@ -72,33 +64,100 @@ export class MarketService {
         return { fee, totalCost };
     }
 
+    private calcularMultaVenda(fidelidadeAte: Date, agora: Date, marketValue: number) {
+        if (agora >= fidelidadeAte) {
+            return { remainingDays: 0, penaltyRate: 0, penalty: 0.00, contractStatus: 'ENCERRADO' };
+        }
+
+        const diffMs = fidelidadeAte.getTime() - agora.getTime();
+        const remainingDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+        let penaltyRate = 0;
+        if (remainingDays >= 181) {
+            penaltyRate = 20;
+        } else if (remainingDays >= 31) {
+            penaltyRate = 10;
+        } else if (remainingDays >= 1) {
+            penaltyRate = 5;
+        }
+
+        let penalty = Number((marketValue * (penaltyRate / 100)).toFixed(2));
+        if (penalty > 10.00) {
+            penalty = 10.00;
+        }
+
+        return {
+            remainingDays,
+            penaltyRate,
+            penalty,
+            contractStatus: 'RESCINDIDO',
+        };
+    }
+
+    private calcularComissaoVenda(marketValue: number, purchaseValue: number) {
+        const profit = Number((marketValue - purchaseValue).toFixed(2));
+
+        if (profit <= 0) {
+            return { profit, commission: 0.00 };
+        }
+
+        let commission = 0.00;
+        if (profit <= 10.00) {
+            commission = profit * 0.10;
+        } else {
+            commission = (10.00 * 0.10) + ((profit - 10.00) * 0.20);
+        }
+
+        return {
+            profit,
+            commission: Number(commission.toFixed(2)),
+        };
+    }
 
     async buyPlayer(id: number, dto: BuyPlayerDto) {
-        const player = await this.prisma.jogadores.findFirst({
-            where: { id, excluido_em: null },
-        });
-
-        const club = await this.prisma.clubes.findUnique({
-            where: { id: dto.club_id },
-        });
-
-        if (!club) {
-            throw new NotFoundException({ message: `Clube com ID:${dto.club_id} não encontrado.` });
-        }
-        if (!player) {
-            throw new NotFoundException({ message: `Jogador com ID:${id} não encontrado.` });
-        }
-
-        const agora = new Date();
         const fimFidelidade = this.validarFidelidade(dto.loyalty_until);
-        await this.validarElegibilidadeCompra(player, dto.club_id);
-        const marketValue = calcularValorMercado(player);
-        const { fee, totalCost } = this.calcularCustosCompra(marketValue, Number(club.caixa));
 
-        const clubCash = Number(club.caixa.toFixed(2));
+        return this.prisma.$transaction(async (tx) => {
+            const player = await tx.jogadores.findFirst({
+                where: { id, excluido_em: null },
+            });
+            if (!player) {
+                throw new NotFoundException({ message: `Jogador com ID:${id} não encontrado.` });
+            }
+            if (player.clube_id !== null) {
+                throw new ConflictException({ message: `O jogador já está vinculado a um clube. Clube atual: ${player.clube_id}` });
+            }
 
-        const resultado = await this.prisma.$transaction(async (tx) => {
+            const club = await tx.clubes.findUnique({
+                where: { id: dto.club_id },
+            });
+            if (!club) {
+                throw new NotFoundException({ message: `Clube com ID:${dto.club_id} não encontrado.` });
+            }
+
+            const totalElenco = await tx.jogadores.count({
+                where: { clube_id: dto.club_id, excluido_em: null },
+            });
+            if (totalElenco >= 12) {
+                throw new ConflictException({ message: 'O clube já atingiu o limite de 12 jogadores no elenco.' });
+            }
+
+            const jaVendeu = await tx.transacoes.findFirst({
+                where: { clube_id: dto.club_id, jogador_id: player.id, tipo: 'VENDA' },
+            });
+            if (jaVendeu) {
+                throw new ConflictException({
+                    message: 'O clube não pode comprar um jogador que ele mesmo já vendeu anteriormente.',
+                });
+            }
+
+            const marketValue = calcularValorMercado(player);
+            const { fee, totalCost } = this.calcularCustosCompra(marketValue, Number(club.caixa));
+
+            const agora = new Date();
+            const clubCash = Number(club.caixa);
             const novoCaixa = Number((clubCash - totalCost).toFixed(2));
+
             await tx.clubes.update({
                 where: { id: dto.club_id },
                 data: { caixa: novoCaixa },
@@ -106,7 +165,7 @@ export class MarketService {
 
             await tx.jogadores.update({
                 where: { id: player.id },
-                data: { clube_id: dto.club_id }
+                data: { clube_id: dto.club_id },
             });
 
             const contrato = await tx.contratos.create({
@@ -117,7 +176,7 @@ export class MarketService {
                     fidelidade_ate: fimFidelidade,
                     situacao: 'ATIVO',
                     iniciado_em: agora,
-                }
+                },
             });
 
             const transacao = await tx.transacoes.create({
@@ -132,63 +191,63 @@ export class MarketService {
                     lucro: null,
                     variacao_caixa: -totalCost,
                     criado_em: agora,
-                }
+                },
             });
-            return { transacao, contrato, novoCaixa };
-        });
 
-        return TransactionMapper.toResponse(resultado.transacao, resultado.contrato, resultado.novoCaixa);
+            return TransactionMapper.toBuyResponse(transacao, contrato, novoCaixa);
+        });
     }
 
     async sellPlayer(id: number) {
-        const player = await this.prisma.jogadores.findFirst({
-            where: { id, excluido_em: null },
-        });
+        return this.prisma.$transaction(async (tx) => {
+            const player = await tx.jogadores.findFirst({
+                where: { id, excluido_em: null },
+            });
 
-        if (!player) {
-            throw new NotFoundException({ message: `Jogador com ID:${id} não encontrado.` });
-        }
-        if (player.clube_id === null) {
-            throw new ConflictException({ message: 'O jogador não está vinculado a nenhum clube.' });
-        }
+            if (!player) {
+                throw new NotFoundException({ message: `Jogador com ID:${id} não encontrado.` });
+            }
+            if (player.clube_id === null) {
+                throw new ConflictException({ message: 'O jogador não está vinculado a nenhum clube.' });
+            }
 
-        const clubId = player.clube_id;
-        const club = await this.prisma.clubes.findUnique({
-            where: { id: clubId },
-        })
+            const clubId = player.clube_id;
+            const club = await tx.clubes.findUnique({
+                where: { id: clubId },
+            });
 
-        if (!club) {
-            throw new NotFoundException({ message: `Clube com ID:${clubId} não encontrado.` });
-        }
+            if (!club) {
+                throw new NotFoundException({ message: `Clube com ID:${clubId} não encontrado.` });
+            }
 
-        const contratoAtivo = await this.prisma.contratos.findFirst({
-            where: {
-                jogador_id: player.id,
-                clube_id: clubId,
-                situacao: 'ATIVO'
-            },
-        });
+            const contratoAtivo = await tx.contratos.findFirst({
+                where: {
+                    jogador_id: player.id,
+                    clube_id: clubId,
+                    situacao: 'ATIVO',
+                },
+            });
 
-        if (!contratoAtivo) {
-            throw new ConflictException({ message: 'Não há contrato ativo para este jogador no clube.' });
-        }
+            if (!contratoAtivo) {
+                throw new ConflictException({ message: 'Não há contrato ativo para este jogador no clube.' });
+            }
 
-        const agora = new Date();
-        const marketValue = calcularValorMercado(player);
+            const agora = new Date();
+            const marketValue = calcularValorMercado(player);
+            const purchaseValue = Number(contratoAtivo.valor_compra);
 
-        let penalty = 0.00;
-        if (contratoAtivo.fidelidade_ate && agora < new Date(contratoAtivo.fidelidade_ate)) {
-            penalty = Number((marketValue * 0.10).toFixed(2));
-        }
+            const { remainingDays, penaltyRate, penalty, contractStatus } = this.calcularMultaVenda(
+                new Date(contratoAtivo.fidelidade_ate),
+                agora,
+                marketValue,
+            );
 
-        const cashChange = Number((marketValue - penalty).toFixed(2)); //novo caixa
-        const purchaseValue = Number(contratoAtivo.valor_compra); //valor de compra
-        const profit = Number((cashChange - purchaseValue).toFixed(2)); //lucro
+            const { profit, commission } = this.calcularComissaoVenda(marketValue, purchaseValue);
 
-        const clubCash = Number(club.caixa.toFixed(2)); //caixa atual do clube
-        const newCash = Number((clubCash + cashChange).toFixed(2)); //caixa final do clube após a venda
+            const cashChange = Number((marketValue - penalty - commission).toFixed(2));
+            const clubCash = Number(club.caixa);
+            const newCash = Number((clubCash + cashChange).toFixed(2));
 
-        const resultado = await this.prisma.$transaction(async (tx) => {
             await tx.clubes.update({
                 where: { id: clubId },
                 data: { caixa: newCash },
@@ -196,16 +255,16 @@ export class MarketService {
 
             await tx.jogadores.update({
                 where: { id: player.id },
-                data: { clube_id: null }
+                data: { clube_id: null },
             });
 
-            const contratoEncerrado = await tx.contratos.update({
+            await tx.contratos.update({
                 where: { id: contratoAtivo.id },
-                data: { situacao: 'RESCINDIDO' }
+                data: { situacao: contractStatus, encerrado_em: agora },
             });
 
             await tx.escalacoes.deleteMany({
-                where: { jogador_id: player.id }
+                where: { jogador_id: player.id },
             });
 
             const transacao = await tx.transacoes.create({
@@ -215,7 +274,7 @@ export class MarketService {
                     nome_jogador: player.nome,
                     tipo: 'VENDA',
                     valor: marketValue,
-                    taxa: 0.00,
+                    taxa: commission,
                     multa: penalty,
                     lucro: profit,
                     variacao_caixa: cashChange,
@@ -223,13 +282,15 @@ export class MarketService {
                 },
             });
 
-            return { transacao, contrato: contratoEncerrado, newCash };
+            return TransactionMapper.toSellResponse({
+                transaction: transacao,
+                purchaseValue,
+                remainingDays,
+                penaltyRate,
+                contractStatus,
+                clubCash: newCash,
+            });
         });
-        return TransactionMapper.toResponse(
-            resultado.transacao,
-            resultado.contrato,
-            resultado.newCash,
-        );
     }
 
     async getClubTransactions(clubId: number, query: GetTransactionsQueryDto) {
@@ -261,44 +322,42 @@ export class MarketService {
 
         const transactions = await this.prisma.transacoes.findMany({
             where,
-            orderBy: [
-                { criado_em: 'desc' },
-                { id: 'desc' }
-            ],
+            orderBy: [{ criado_em: 'desc' }, { id: 'desc' }],
         });
 
-        const summary = transactions.reduce((acc, t) => {
-            const val = Number(t.valor);
-            const fee = Number(t.taxa);
-            const penalty = Number(t.multa);
-            const profit = t.lucro !== null ? Number(t.lucro) : 0;
-            const cashChange = Number(t.variacao_caixa);
+        const summary = transactions.reduce(
+            (acc, t) => {
+                const val = Number(t.valor);
+                const fee = Number(t.taxa);
+                const penalty = Number(t.multa);
+                const profit = t.lucro !== null ? Number(t.lucro) : 0;
+                const cashChange = Number(t.variacao_caixa);
 
-            if (t.tipo === 'COMPRA') {
-                acc.total_spent += val + fee;
-            } else if (t.tipo === 'VENDA') {
-                acc.total_received += cashChange;
-                acc.total_profit += profit;
-            }
+                if (t.tipo === 'COMPRA') {
+                    acc.total_spent += val + fee;
+                } else if (t.tipo === 'VENDA') {
+                    acc.total_received += cashChange;
+                    acc.total_profit += profit;
+                }
 
-            acc.total_fees += fee;
-            acc.total_penalties += penalty;
+                acc.total_fees += fee;
+                acc.total_penalties += penalty;
 
-            return acc;
-        },
+                return acc;
+            },
             {
                 total_spent: 0,
                 total_received: 0,
                 total_fees: 0,
                 total_penalties: 0,
                 total_profit: 0,
-            }
+            },
         );
+
         return TransactionMapper.toTransactionsResponse(transactions, summary);
     }
 
     async exportTransactionsCsv(clubId: number, query: GetTransactionsQueryDto): Promise<string> {
-
         const club = await this.prisma.clubes.findUnique({
             where: { id: clubId },
         });
@@ -327,10 +386,8 @@ export class MarketService {
         }
 
         const transactions = await this.prisma.transacoes.findMany({
-            where, orderBy: [
-                { criado_em: 'desc' },
-                { id: 'desc' }
-            ]
+            where,
+            orderBy: [{ criado_em: 'desc' }, { id: 'desc' }],
         });
 
         return generateTransactionsCsv(transactions);

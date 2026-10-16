@@ -1,10 +1,17 @@
 import { Parser } from '@json2csv/plainjs';
 
+function formatBrazilianDate(dateInput: Date | string): string {
+    const date = new Date(dateInput);
+    const offsetMs = -3 * 60 * 60 * 1000;
+    const localDate = new Date(date.getTime() + offsetMs);
+
+    const iso = localDate.toISOString();
+    return iso.substring(0, 19) + '-03:00';
+}
+
 export function generateTransactionsCsv(transactions: any[]): string {
     const data = transactions.map((t) => ({
-        data_hora: t.criado_em instanceof Date
-            ? t.criado_em.toISOString().replace('Z', '-03:00')
-            : String(t.criado_em),
+        data_hora: formatBrazilianDate(t.criado_em),
         tipo: t.tipo,
         jogador: t.nome_jogador,
         valor: Number(t.valor).toFixed(2).replace('.', ','),

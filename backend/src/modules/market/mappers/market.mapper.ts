@@ -28,7 +28,7 @@ export class TransactionMapper {
         };
     }
 
-    static toResponse(transaction: any, contract: any, clubCash: number) {
+    static toBuyResponse(transaction: any, contract: any, clubCash: number) {
         return {
             id: transaction.id,
             club_id: transaction.clube_id,
@@ -46,6 +46,35 @@ export class TransactionMapper {
                 loyalty_until: contract.fidelidade_ate,
                 status: contract.situacao,
             },
+            club_cash: Number(clubCash),
+        };
+    }
+
+    static toSellResponse(params: {
+        transaction: any;
+        purchaseValue: number;
+        remainingDays: number;
+        penaltyRate: number;
+        contractStatus: string;
+        clubCash: number;
+    }) {
+        const { transaction, purchaseValue, remainingDays, penaltyRate, contractStatus, clubCash } = params;
+        return {
+            id: transaction.id,
+            club_id: transaction.clube_id,
+            player_id: transaction.jogador_id,
+            player_name: transaction.nome_jogador,
+            type: transaction.tipo,
+            value: Number(transaction.valor),
+            fee: Number(transaction.taxa),
+            penalty: Number(transaction.multa),
+            profit: Number(transaction.lucro),
+            cash_change: Number(transaction.variacao_caixa),
+            created_at: transaction.criado_em,
+            purchase_value: Number(purchaseValue),
+            remaining_days: remainingDays,
+            penalty_rate: penaltyRate,
+            contract_status: contractStatus,
             club_cash: Number(clubCash),
         };
     }

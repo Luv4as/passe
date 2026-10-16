@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Matches } from 'class-validator';
+import { IsInt, IsOptional, IsString, Matches, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class GetTransactionsQueryDto {
@@ -11,5 +11,7 @@ export class GetTransactionsQueryDto {
 
   @IsOptional()
   @Type(() => Number)
+  @IsInt({ message: 'player_id deve ser um número inteiro' })
+  @Min(1, { message: 'player_id deve ser um número inteiro positivo' })
   player_id?: number;
 }
