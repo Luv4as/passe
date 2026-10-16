@@ -140,6 +140,58 @@
   }
 }
 
+@layer components {
+
+  /* HEADINGS (Títulos) */
+  .heading {
+    @apply text-2xl font-semibold tracking-tight text-foreground sm:text-xl leading-tight;
+  }
+
+  .heading-mobile {
+    @apply text-xl font-semibold tracking-tight text-foreground sm:text-lg leading-snug;
+  }
+
+  .heading-dialog {
+    @apply text-lg font-semibold tracking-tight text-foreground sm:text-lg leading-snug;
+  }
+
+  .heading-card {
+    @apply text-base font-semibold text-foreground leading-normal;
+  }
+
+  /* KPI */
+  .display {
+    @apply text-2xl font-semibold tracking-tight text-foreground;
+  }
+
+  /* 2. BODY (Corpo de Texto) */
+  .body {
+    @apply text-base font-normal leading-relaxed text-foreground sm:text-sm;
+  }
+
+  .body-sm {
+    @apply text-sm font-normal leading-relaxed text-foreground;
+  }
+
+  .body-sm-medium {
+    @apply text-sm font-medium leading-relaxed text-foreground;
+  }
+
+  .body-sm-semibold {
+    @apply text-sm font-semibold leading-relaxed text-foreground;
+  }
+
+  /* CAPTIONS */
+  .caption {
+    @apply text-xs font-normal leading-normal text-foreground;
+  }
+
+  .caption-xs-medium {
+    @apply text-xs font-medium leading-normal text-foreground;
+  }
+
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
