@@ -6,7 +6,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { SvgIcon } from "@/components/ui/svg-icon";
 import { AppSidebar } from "@/src/components/sidebar";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { usePathname } from "next/dist/client/components/navigation";
 
 export default function MainLayout({
