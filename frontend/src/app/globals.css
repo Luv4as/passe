@@ -36,7 +36,16 @@
   /* Status */
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+  --color-warning-soft-border: var(--warning-soft-border);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-foreground: var(--success-soft-foreground);
+  --color-success-soft-border: var(--success-soft-border);
   --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-destructive-soft-foreground: var(--destructive-soft-foreground);
+  --color-destructive-soft-border: var(--destructive-soft-border);
 
   /* Sidebar */
   --color-sidebar: var(--sidebar);
@@ -49,14 +58,16 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Avatares */
-  --color-avatar-violet: #EDE9FE;
-  --color-avatar-violet-foreground: #7008E7;
-  --color-avatar-pink: #FCE7F3;
-  --color-avatar-pink-foreground: #C2005C;
-  --color-avatar-cyan: #CEFAFE;
-  --color-avatar-cyan-foreground: #005F78;
-  --color-avatar-teal: #CBFBF1;
-  --color-avatar-teal-foreground: #005F5A;
+  --color-avatar-zinc: var(--avatar-zinc);
+  --color-avatar-zinc-foreground: var(--avatar-zinc-foreground);
+  --color-avatar-violet: var(--avatar-violet);
+  --color-avatar-violet-foreground: var(--avatar-violet-foreground);
+  --color-avatar-pink: var(--avatar-pink);
+  --color-avatar-pink-foreground: var(--avatar-pink-foreground);
+  --color-avatar-cyan: var(--avatar-cyan);
+  --color-avatar-cyan-foreground: var(--avatar-cyan-foreground);
+  --color-avatar-teal: var(--avatar-teal);
+  --color-avatar-teal-foreground: var(--avatar-teal-foreground);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
@@ -97,10 +108,40 @@
   /* STATUS COLORS */
   --success-colorW: #00813A;
   --success-colorB: #05DF72;
+  --success-soft-colorW: #F0FDF4;
+  --success-soft-colorB: #032E15;
+  --success-soft-foreground-colorW: #016630;
+  --success-soft-foreground-colorB: #7BF1A8;
+  --success-soft-border-colorW: #B9F8CF;
+  --success-soft-border-colorB: #0D542B;
   --warning-colorW: #B55200;
   --warning-colorB: #FABC00;
+  --warning-soft-colorW: #FFFBEB;
+  --warning-soft-colorB: #461901;
+  --warning-soft-foreground-colorW: #953D00;
+  --warning-soft-foreground-colorB: #FFD237;
+  --warning-soft-border-colorW: #FEE685;
+  --warning-soft-border-colorB: #7B3306;
   --destructive-colorW: #E40016;
   --destructive-colorB: #FF6568;
+  --destructive-soft-colorW: #FEF2F2;
+  --destructive-soft-colorB: #460809;
+  --destructive-soft-foreground-colorW: #BF000F;
+  --destructive-soft-foreground-colorB: #FFA3A4;
+  --destructive-soft-border-colorW: #FFCACA;
+  --destructive-soft-border-colorB: #82181A;
+
+  /* Avatares */
+  --avatar-violet: #EDE9FE;
+  --avatar-violet-foreground: #7008E7;
+  --avatar-pink: #FCE7F3;
+  --avatar-pink-foreground: #C2005C;
+  --avatar-cyan: #CEFAFE;
+  --avatar-cyan-foreground: #005F78;
+  --avatar-teal: #CBFBF1;
+  --avatar-teal-foreground: #005F5A;
+  --avatar-zinc: #E4E4E7;
+  --avatar-zinc-foreground: #3F3F46;
 
   /* SIDEBAR COLORS */
   --sidebar-colorW: #FAFAFA;
@@ -113,7 +154,7 @@
   /* ACTIONS (Ações Dinâmicas) */
   --primary-color: #155dfc;
   --primary-foreground-color: #FFFFFF;
-  
+
   --background: var(--background-colorW);
   --foreground: var(--foreground-colorW);
   --card: var(--card-colorW);
@@ -128,7 +169,6 @@
   --input: var(--input-colorW);
   --ring: var(--ring-colorW);
 
-
   --primary: var(--primary-color);
   --primary-hover: #1447E6;
   --primary-foreground: var(--primary-foreground-color);
@@ -138,8 +178,17 @@
   --secondary: var(--accent-colorW);
   --secondary-foreground: var(--accent-foreground-colorW);
   --destructive: var(--destructive-colorW);
+  --destructive-soft: var(--destructive-soft-colorW);
+  --destructive-soft-foreground: var(--destructive-soft-foreground-colorW);
+  --destructive-soft-border: var(--destructive-soft-border-colorW);
   --success: var(--success-colorW);
+  --success-soft: var(--success-soft-colorW);
+  --success-soft-foreground: var(--success-soft-foreground-colorW);
+  --success-soft-border: var(--success-soft-border-colorW);
   --warning: var(--warning-colorW);
+  --warning-soft: var(--warning-soft-colorW);
+  --warning-soft-foreground: var(--warning-soft-foreground-colorW);
+  --warning-soft-border: var(--warning-soft-border-colorW);
 
   /* Sidebar Conectada */
   --sidebar: var(--sidebar-colorW);
@@ -177,8 +226,16 @@
     --secondary-foreground: var(--accent-foreground-colorB);
     --destructive: var(--destructive-colorB);
     --success: var(--success-colorB);
+    --success-soft: var(--success-soft-colorB);
+    --success-soft-foreground: var(--success-soft-foreground-colorB);
+    --success-soft-border: var(--success-soft-border-colorB);
     --warning: var(--warning-colorB);
-    --destructive: var(--destructive-colorB);
+    --warning-soft: var(--warning-soft-colorB);
+    --warning-soft-foreground: var(--warning-soft-foreground-colorB);
+    --warning-soft-border: var(--warning-soft-border-colorB);
+    --destructive-soft: var(--destructive-soft-colorB);
+    --destructive-soft-foreground: var(--destructive-soft-foreground-colorB);
+    --destructive-soft-border: var(--destructive-soft-border-colorB);
     --sidebar: var(--sidebar-colorB);
     --sidebar-foreground: var(--sidebar-foreground-colorB);
     --sidebar-accent: var(--accent-colorB);
@@ -210,8 +267,17 @@
   --secondary: var(--accent-colorB);
   --secondary-foreground: var(--accent-foreground-colorB);
   --destructive: var(--destructive-colorB);
+  --destructive-soft: var(--destructive-soft-colorB);
+  --destructive-soft-foreground: var(--destructive-soft-foreground-colorB);
+  --destructive-soft-border: var(--destructive-soft-border-colorB);
   --success: var(--success-colorB);
+  --success-soft: var(--success-soft-colorB);
+  --success-soft-foreground: var(--success-soft-foreground-colorB);
+  --success-soft-border: var(--success-soft-border-colorB);
   --warning: var(--warning-colorB);
+  --warning-soft: var(--warning-soft-colorB);
+  --warning-soft-foreground: var(--warning-soft-foreground-colorB);
+  --warning-soft-border: var(--warning-soft-border-colorB);
 
   --sidebar: var(--sidebar-colorB);
   --sidebar-foreground: var(--sidebar-foreground-colorB);
@@ -221,10 +287,7 @@
   --sidebar-ring: var(--ring-colorB);
 }
 
-/* 3. Componentes de Tipografia Padronizados */
 @layer components {
-
-  /* HEADINGS */
   .heading {
     @apply text-2xl font-semibold tracking-tight text-foreground sm:text-xl leading-tight;
   }
@@ -241,12 +304,10 @@
     @apply text-base font-semibold text-foreground leading-normal;
   }
 
-  /* KPI */
   .display {
     @apply text-2xl font-semibold tracking-tight text-foreground;
   }
 
-  /* 2. BODY (Corpo de Texto) */
   .body {
     @apply text-base font-normal leading-relaxed text-foreground sm:text-sm;
   }
@@ -263,7 +324,6 @@
     @apply text-sm font-semibold leading-relaxed text-foreground;
   }
 
-  /* CAPTIONS */
   .caption-xs {
     @apply text-xs font-normal leading-normal text-foreground;
   }
@@ -271,5 +331,4 @@
   .caption-xs-medium {
     @apply text-xs font-medium leading-normal text-foreground;
   }
-
 }
