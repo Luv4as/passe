@@ -30,3 +30,6 @@ Os serviços ficam disponíveis em:
 - Interface: http://localhost:3000
 - API: http://localhost:5173
 - PostgreSQL: localhost:5432
+
+## Bibliotecas usada
+- **@json2csv/plainjs**: Utilizada no backend para formatar e exportar o histórico de transações financeiras dos clubes em formato CSV (atendendo à regra RN18).
