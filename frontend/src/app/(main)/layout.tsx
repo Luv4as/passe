@@ -1,19 +1,20 @@
 'use client'
 
+import { Badge } from "@/components/ui/badge";
 import { IconContainer } from "@/components/ui/icon-container";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { SvgIcon } from "@/components/ui/svg-icon";
 import { AppSidebar } from "@/src/components/sidebar";
-import { ChevronRight } from "lucide-react";
+import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
+import { ChevronRight, Plus } from "lucide-react";
 import { usePathname } from "next/dist/client/components/navigation";
-
 
 export default function MainLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-
+    const { headerAction } = useHeaderAction();
     const segments = usePathname().split("/").filter(Boolean);
     const routeFormatted = segments.map((segment) => {
         if (segment === "market") {
@@ -93,26 +94,33 @@ export default function MainLayout({
 
                 </header>
 
-                <main className="flex-1 p-6">
-                    <div className="mb-6 flex flex-row items-center gap-2">
-                        <div>
-                            <IconContainer className=" bg-primary-soft border border-primary h-12 w-12 ">
-                                <SvgIcon src={getPageIcon()} className="bg-primary h-6 w-6" />
-                            </IconContainer>
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <h1 className="text-2xl heading">{routeFormatted[routeFormatted.length - 1]}</h1>
-                            <div className="body-sm text-muted-foreground">
-                                {getPageDescription() !== "Stats do clube" ? (
-                                    getPageDescription()
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        
-                                    </div>
-                                )}
+                <main className="flex-1 py-7 px-8">
+                    <div className="flex flex-row items-baseline justify-between mb-6 gap-2">
+                        <div className="flex flex-row items-center gap-4">
+                            <div>
+                                <IconContainer className=" bg-primary-soft border border-primary h-12 w-12 ">
+                                    <SvgIcon src={getPageIcon()} className="bg-primary h-6 w-6" />
+                                </IconContainer>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <h1 className="text-2xl heading">{routeFormatted[routeFormatted.length - 1]}</h1>
+                                <div className="body-sm text-muted-foreground">
+                                    {getPageDescription() !== "Stats do clube" ? (
+                                        getPageDescription()
+                                    ) : (
+                                        <div className="flex flex-row items-center gap-2">
+                                            <Badge variant={"outline"} className="border-border bg-background text-foreground" >
+                                                Sigla { }
+                                            </Badge>
+                                            <Badge variant={"outline"} className="border-border bg-background text-foreground">
+                                                { } de { } jogadores
+                                            </Badge>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-
+                        {headerAction}
                     </div>
                     {children}
                 </main>
