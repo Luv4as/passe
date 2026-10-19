@@ -53,17 +53,17 @@ export function AppSidebar() {
                         <SidebarMenu>
                             <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                                 <SidebarMenuButton
-                                    render={<Link href="/players" />}
+                                    render={<Link href="/market/players" />}
                                     tooltip="Jogadores"
-                                    isActive={pathname === "/players" || pathname === "/"}
+                                    isActive={pathname === "/market/players" || pathname === "/"}
                                 >
                                     <SvgIcon
                                         src="/jogadores.svg"
-                                        className={pathname === "/players" || pathname === "/"
+                                        className={pathname === "/market/players" || pathname === "/"
                                             ? "bg-primary"
                                             : "bg-muted-foreground"}
                                     />
-                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname === "/players" || pathname === "/"
+                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname === "/market/players" || pathname === "/"
                                         ? "body-sm-medium text-sidebar-foreground"
                                         : "body-sm text-sidebar-foreground"
                                         }`}>
@@ -77,17 +77,17 @@ export function AppSidebar() {
 
                             <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                                 <SidebarMenuButton
-                                    render={<Link href="/clubs" />}
+                                    render={<Link href="/market/clubs" />}
                                     tooltip="Clubes"
-                                    isActive={pathname.startsWith("/clubs")}
+                                    isActive={pathname.startsWith("/market/clubs")}
                                 >
                                     <SvgIcon
                                         src="/clube.svg"
-                                        className={pathname.startsWith("/clubs")
+                                        className={pathname.startsWith("/market/clubs")
                                             ? "bg-primary"
                                             : "bg-muted-foreground"}
                                     />
-                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname.startsWith("/clubs")
+                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname.startsWith("/market/clubs")
                                         ? "body-sm-medium text-sidebar-foreground"
                                         : "body-sm text-sidebar-foreground"
                                         }`}>
@@ -110,17 +110,17 @@ export function AppSidebar() {
                         <SidebarMenu>
                             <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                                 <SidebarMenuButton
-                                    render={<Link href="/matches" />}
+                                    render={<Link href="/league/matches" />}
                                     tooltip="Partidas"
-                                    isActive={pathname.startsWith("/matches")}
+                                    isActive={pathname.startsWith("/league/matches")}
                                 >
                                     <SvgIcon
                                         src="/partidas.svg"
-                                        className={pathname.startsWith("/matches")
+                                        className={pathname.startsWith("/league/matches")
                                             ? "bg-primary"
                                             : "bg-muted-foreground"}
                                     />
-                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname.startsWith("/matches")
+                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname.startsWith("/league/matches")
                                         ? "body-sm-medium text-sidebar-foreground"
                                         : "body-sm text-sidebar-foreground"
                                         }`}>
@@ -134,17 +134,17 @@ export function AppSidebar() {
 
                             <SidebarMenuItem className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                                 <SidebarMenuButton
-                                    render={<Link href="/standings" />}
+                                    render={<Link href="/league/standings" />}
                                     tooltip="Classificação"
-                                    isActive={pathname === "/standings"}
+                                    isActive={pathname === "/league/standings"}
                                 >
                                     <SvgIcon
                                         src="/classificacao.svg"
-                                        className={pathname === "/standings"
+                                        className={pathname === "/league/standings"
                                             ? "bg-primary"
                                             : "bg-muted-foreground"}
                                     />
-                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname === "/standings"
+                                    <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname === "/league/standings"
                                         ? "body-sm-medium text-primary"
                                         : "body-sm text-sidebar-foreground"
                                         }`}>
@@ -164,7 +164,7 @@ export function AppSidebar() {
                         <SidebarMenu>
                             {clubs.map((club) => (
                                 <SidebarMenuItem key={club.id} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
-                                    <Link href={`/clubs/${club.id}`} className="w-full">
+                                    <Link href={`/market/clubs/${club.id}`} className="w-full">
                                         <ClubSidebar
                                             initial={club.nome.charAt(0).toUpperCase()}
                                             clubName={club.nome}
