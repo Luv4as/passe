@@ -1,9 +1,14 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
+  /* Cores Base */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -18,10 +23,12 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Variáveis estáticas / de ações */
-  --color-primary: var(--primary-color);
+  /* Ações & Variáveis do Shadcn */
+  --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
-  --color-primary-foreground: var(--primary-foreground-color);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
 
   /* Status */
   --color-success: var(--success);
@@ -31,7 +38,12 @@
   /* Sidebar */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 
   /* Avatares */
   --color-avatar-violet: #EDE9FE;
@@ -42,10 +54,16 @@
   --color-avatar-cyan-foreground: #005F78;
   --color-avatar-teal: #CBFBF1;
   --color-avatar-teal-foreground: #005F5A;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
 }
 
 :root {
-  /* BASE COLORS */
+  /* BASE COLORS (Brutas) */
   --background-colorW: #ffffff;
   --background-colorB: #09090B;
   --foreground-colorW: #09090B;
@@ -92,7 +110,7 @@
   /* ACTIONS (Ações Dinâmicas) */
   --primary-color: #155dfc;
   --primary-foreground-color: #FFFFFF;
-
+  
   --background: var(--background-colorW);
   --foreground: var(--foreground-colorW);
   --card: var(--card-colorW);
@@ -106,13 +124,28 @@
   --border: var(--border-colorW);
   --input: var(--input-colorW);
   --ring: var(--ring-colorW);
+
+
+  --primary: var(--primary-color);
   --primary-hover: #1447E6;
+  --primary-foreground: var(--primary-foreground-color);
+  --secondary: var(--accent-colorW);
+  --secondary-foreground: var(--accent-foreground-colorW);
+  --destructive: var(--destructive-colorW);
   --success: var(--success-colorW);
   --warning: var(--warning-colorW);
-  --destructive: var(--destructive-colorW);
+
+  /* Sidebar Conectada */
   --sidebar: var(--sidebar-colorW);
   --sidebar-foreground: var(--sidebar-foreground-colorW);
+  --sidebar-primary: var(--primary-color);
+  --sidebar-primary-foreground: var(--primary-foreground-color);
+  --sidebar-accent: var(--accent-colorW);
+  --sidebar-accent-foreground: var(--accent-foreground-colorW);
   --sidebar-border: var(--sidebar-border-colorW);
+  --sidebar-ring: var(--ring-colorW);
+
+  --radius: 0.625rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -131,18 +164,55 @@
     --input: var(--input-colorB);
     --ring: var(--ring-colorB);
     --primary-hover: #3280FF;
+    --secondary: var(--accent-colorB);
+    --secondary-foreground: var(--accent-foreground-colorB);
+    --destructive: var(--destructive-colorB);
     --success: var(--success-colorB);
     --warning: var(--warning-colorB);
     --destructive: var(--destructive-colorB);
     --sidebar: var(--sidebar-colorB);
     --sidebar-foreground: var(--sidebar-foreground-colorB);
+    --sidebar-accent: var(--accent-colorB);
+    --sidebar-accent-foreground: var(--accent-foreground-colorB);
     --sidebar-border: var(--sidebar-border-colorB);
+    --sidebar-ring: var(--ring-colorB);
   }
 }
 
+.dark {
+  --background: var(--background-colorB);
+  --foreground: var(--foreground-colorB);
+  --card: var(--card-colorB);
+  --card-foreground: var(--card-foreground-colorB);
+  --popover: var(--popover-colorB);
+  --popover-foreground: var(--popover-foreground-colorB);
+  --muted: var(--muted-colorB);
+  --muted-foreground: var(--muted-foreground-colorB);
+  --accent: var(--accent-colorB);
+  --accent-foreground: var(--accent-foreground-colorB);
+  --border: var(--border-colorB);
+  --input: var(--input-colorB);
+  --ring: var(--ring-colorB);
+
+  --primary-hover: #3280FF;
+  --secondary: var(--accent-colorB);
+  --secondary-foreground: var(--accent-foreground-colorB);
+  --destructive: var(--destructive-colorB);
+  --success: var(--success-colorB);
+  --warning: var(--warning-colorB);
+
+  --sidebar: var(--sidebar-colorB);
+  --sidebar-foreground: var(--sidebar-foreground-colorB);
+  --sidebar-accent: var(--accent-colorB);
+  --sidebar-accent-foreground: var(--accent-foreground-colorB);
+  --sidebar-border: var(--sidebar-border-colorB);
+  --sidebar-ring: var(--ring-colorB);
+}
+
+/* 3. Componentes de Tipografia Padronizados */
 @layer components {
 
-  /* HEADINGS (Títulos) */
+  /* HEADINGS */
   .heading {
     @apply text-2xl font-semibold tracking-tight text-foreground sm:text-xl leading-tight;
   }
@@ -182,7 +252,7 @@
   }
 
   /* CAPTIONS */
-  .caption {
+  .caption-xs {
     @apply text-xs font-normal leading-normal text-foreground;
   }
 
@@ -190,10 +260,4 @@
     @apply text-xs font-medium leading-normal text-foreground;
   }
 
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
 }
