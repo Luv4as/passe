@@ -1,3 +1,4 @@
+import { IconContainer } from "./icon-container";
 import { SvgIcon } from "./svg-icon";
 
 interface LeagueBasicsProps {
@@ -6,14 +7,6 @@ interface LeagueBasicsProps {
     lastMatch?: string;
     clubs?: number;
     players?: number;
-}
-
-function IconContainer({ children }: { children: React.ReactNode }) {
-    return (
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-            {children}
-        </div>
-    );
 }
 
 export default function LeagueBasics({ className, leagueName, lastMatch, clubs, players }: LeagueBasicsProps) {

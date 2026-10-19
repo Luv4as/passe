@@ -27,6 +27,9 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft-foreground: var(--primary-soft-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-soft-foreground: var(--soft-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
 
@@ -129,6 +132,9 @@
   --primary: var(--primary-color);
   --primary-hover: #1447E6;
   --primary-foreground: var(--primary-foreground-color);
+  --primary-soft-foreground: #91C5FF;
+  --soft-foreground: #91C5FF;
+  --primary-soft: #EFF6FF;
   --secondary: var(--accent-colorW);
   --secondary-foreground: var(--accent-foreground-colorW);
   --destructive: var(--destructive-colorW);
@@ -164,6 +170,9 @@
     --input: var(--input-colorB);
     --ring: var(--ring-colorB);
     --primary-hover: #3280FF;
+    --primary-soft-foreground: #91C5FF;
+    --primary-soft: #EFF6FF;
+    --soft-foreground: #91C5FF;
     --secondary: var(--accent-colorB);
     --secondary-foreground: var(--accent-foreground-colorB);
     --destructive: var(--destructive-colorB);
@@ -195,6 +204,9 @@
   --ring: var(--ring-colorB);
 
   --primary-hover: #3280FF;
+  --primary-soft-foreground: #91C5FF;
+  --primary-soft: #EFF6FF;
+  --soft-foreground: #91C5FF;
   --secondary: var(--accent-colorB);
   --secondary-foreground: var(--accent-foreground-colorB);
   --destructive: var(--destructive-colorB);

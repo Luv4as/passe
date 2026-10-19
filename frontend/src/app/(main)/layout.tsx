@@ -1,6 +1,8 @@
 'use client'
 
+import { IconContainer } from "@/components/ui/icon-container";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { SvgIcon } from "@/components/ui/svg-icon";
 import { AppSidebar } from "@/src/components/sidebar";
 import { ChevronRight } from "lucide-react";
 import { usePathname } from "next/dist/client/components/navigation";
@@ -35,6 +37,43 @@ export default function MainLayout({
         return segment;
     })
 
+    const getPageDescription = () => {
+        const isClubs = segments.includes("clubs");
+        const isDynamicClub = isClubs && segments.length > segments.indexOf("clubs") + 1;
+
+        if (segments.includes("players")) {
+            return "Cadastre jogadores, acompanhe os indicadores e compre os que estão livres.";
+        }
+        if (isClubs) {
+            return isDynamicClub
+                ? "Cada clube começa com 300,00 em caixa e sem jogadores. A liga aceita no máximo 20 clubes."
+                : "Stats do clube";
+        }
+        if (segments.includes("matches")) {
+            return "Jogue partidas entre clubes com os 5 titulares escalados e acompanhe o histórico.";
+        }
+        if (segments.includes("standings")) {
+            return "Todos os clubes, com 3 pontos por vitória e 1 por empate.";
+        }
+        return "Gerenciamento completo da liga de futebol.";
+    };
+
+    const getPageIcon = () => {
+        if (segments.includes("players")) {
+            return "/jogadores.svg";
+        }
+        if (segments.includes("clubs")) {
+            return "/clube.svg";
+        }
+        if (segments.includes("matches")) {
+            return "/partidas.svg";
+        }
+        if (segments.includes("standings")) {
+            return "/classificacao.svg";
+        }
+        return "/jogadores.svg";
+    }
+
     return (
         <SidebarProvider defaultOpen={true}>
             <AppSidebar />
@@ -55,6 +94,26 @@ export default function MainLayout({
                 </header>
 
                 <main className="flex-1 p-6">
+                    <div className="mb-6 flex flex-row items-center gap-2">
+                        <div>
+                            <IconContainer className=" bg-primary-soft border border-primary h-12 w-12 ">
+                                <SvgIcon src={getPageIcon()} className="bg-primary h-6 w-6" />
+                            </IconContainer>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <h1 className="text-2xl heading">{routeFormatted[routeFormatted.length - 1]}</h1>
+                            <div className="body-sm text-muted-foreground">
+                                {getPageDescription() !== "Stats do clube" ? (
+                                    getPageDescription()
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
                     {children}
                 </main>
             </SidebarInset>
