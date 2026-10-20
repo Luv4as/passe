@@ -16,7 +16,7 @@ export class ClubsController {
 
     @Get(':id')
     findOne(@Param('id', ParseIdPipe) id: number){
-        return //this.clubsService.findOne(id);
+        return this.clubsService.findOne(id);
     }
 
     @Post()
