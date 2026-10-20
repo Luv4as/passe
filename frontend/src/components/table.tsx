@@ -15,7 +15,6 @@ import {
 import { useMemo, useState } from "react";
 import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/tableData";
 import { Dropdown } from "./dropdown";
-import { CreatedPlayer } from "../hooks/useCreatePlayer";
 import DialogDelete from "./dialogDelete";
 
 const conditionClasses: Record<PlayerCondition, string> = {
