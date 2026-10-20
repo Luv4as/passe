@@ -14,5 +14,10 @@ export async function fetchApi<T>(endpoint: string, options?: RequestInit): Prom
         throw new Error(errorData.message || `Erro na requisição: ${response.status}`);
     }
 
-    return response.json();
+    if (response.status === 204) {
+        return null as T;
+    }
+
+    const text = await response.text();
+    return text ? JSON.parse(text) : (null as T);
 }

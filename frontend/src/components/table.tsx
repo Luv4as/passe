@@ -13,8 +13,10 @@ import {
     Trash2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/tableData";
+import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/tableData";
 import { Dropdown } from "./dropdown";
+import { CreatedPlayer } from "../hooks/useCreatePlayer";
+import DialogDelete from "./dialogDelete";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -57,6 +59,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
         page,
         limit: 10,
     });
+    const [playerIsDeleted, setPlayerIsDeleted] = useState<Player | null>(null);
 
     const visiblePlayers = useMemo(
         () => sortAscending ? players : [...players].reverse(),
@@ -183,7 +186,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                                             {
                                                 label: "Excluir",
                                                 icon: <Trash2 size={16} />,
-                                                onClick: () => alert("Excluir"),
+                                                onClick: () => setPlayerIsDeleted(player),
                                             }
                                         ]}
                                     />
@@ -204,6 +207,15 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                     <button type="button" disabled={page >= totalPages} onClick={() => setPage((current) => current + 1)} className="flex items-center gap-1 px-2 disabled:opacity-50">Próxima<ChevronRight size={16} /></button>
                 </nav>
             </footer>
+
+            {playerIsDeleted && (
+                <DialogDelete
+                    open={!!playerIsDeleted}
+                    onOpenChange={(open) => !open && setPlayerIsDeleted(null)}
+                    player={playerIsDeleted}
+                    onCancel={() => setPlayerIsDeleted(null)}
+                    onConfirm={() => { setPlayerIsDeleted(null) }}/>
+            )}
         </section>
     );
 }

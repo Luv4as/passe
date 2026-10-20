@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/toast";
 import { HeaderActionProvider } from "../contexts/HeaderActionContext";
 
 const geistSans = Geist({
@@ -29,9 +30,11 @@ export default function RootLayout({ children }: Readonly<{
     >
       <body className="h-full min-h-screen w-full bg-background text-foreground antialiased m-0 p-0">
         <HeaderActionProvider>
-          <SidebarProvider>
-            {children}
-          </SidebarProvider>
+          <Toaster>
+            <SidebarProvider>
+              {children}
+            </SidebarProvider>
+          </Toaster>
         </HeaderActionProvider>
       </body>
     </html>

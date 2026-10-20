@@ -43,6 +43,7 @@
   --color-success-soft-foreground: var(--success-soft-foreground);
   --color-success-soft-border: var(--success-soft-border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive-soft: var(--destructive-soft);
   --color-destructive-soft-foreground: var(--destructive-soft-foreground);
   --color-destructive-soft-border: var(--destructive-soft-border);
@@ -123,7 +124,7 @@
   --warning-soft-border-colorW: #FEE685;
   --warning-soft-border-colorB: #7B3306;
   --destructive-colorW: #E40016;
-  --destructive-colorB: #FF6568;
+  --destructive-foreground-color: #FFFFFF;
   --destructive-soft-colorW: #FEF2F2;
   --destructive-soft-colorB: #460809;
   --destructive-soft-foreground-colorW: #BF000F;
@@ -178,6 +179,7 @@
   --secondary: var(--accent-colorW);
   --secondary-foreground: var(--accent-foreground-colorW);
   --destructive: var(--destructive-colorW);
+  --destructive-foreground: var(--destructive-foreground-color);
   --destructive-soft: var(--destructive-soft-colorW);
   --destructive-soft-foreground: var(--destructive-soft-foreground-colorW);
   --destructive-soft-border: var(--destructive-soft-border-colorW);
@@ -224,7 +226,8 @@
     --soft-foreground: #91C5FF;
     --secondary: var(--accent-colorB);
     --secondary-foreground: var(--accent-foreground-colorB);
-    --destructive: var(--destructive-colorB);
+    --destructive: var(--destructive-colorW);
+    --destructive-foreground: var(--destructive-foreground-color);
     --success: var(--success-colorB);
     --success-soft: var(--success-soft-colorB);
     --success-soft-foreground: var(--success-soft-foreground-colorB);
@@ -266,7 +269,8 @@
   --soft-foreground: #91C5FF;
   --secondary: var(--accent-colorB);
   --secondary-foreground: var(--accent-foreground-colorB);
-  --destructive: var(--destructive-colorB);
+  --destructive: var(--destructive-colorW);
+  --destructive-foreground: var(--destructive-foreground-color);
   --destructive-soft: var(--destructive-soft-colorB);
   --destructive-soft-foreground: var(--destructive-soft-foreground-colorB);
   --destructive-soft-border: var(--destructive-soft-border-colorB);
