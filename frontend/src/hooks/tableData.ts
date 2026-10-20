@@ -24,6 +24,7 @@ export interface Player {
     physical: number;
     potential: number;
     overall: number;
+    clubId?: number | null;
     clubCode?: string;
     clubName?: string;
     avatarClass: string;
@@ -150,6 +151,7 @@ function toPlayer(player: ApiPlayer, clubs: Map<number, ApiClub>): Player {
         physical: player.physical,
         potential: player.potential,
         overall: player.overall,
+        clubId: player.club_id,
         clubCode: club?.acronym,
         clubName: club?.name,
         avatarClass: avatarClasses[player.id % avatarClasses.length],

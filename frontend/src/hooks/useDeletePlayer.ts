@@ -27,7 +27,6 @@ export function useDeletePlayer(options?: UseDeletePlayerOptions) {
         } finally {
             setDeleting(false);
         }
-        return false;
     }
 
     return { deletePlayer, error, deleting };

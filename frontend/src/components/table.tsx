@@ -16,6 +16,7 @@ import { useMemo, useState } from "react";
 import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/tableData";
 import { Dropdown } from "./dropdown";
 import DialogDelete from "./dialogDelete";
+import { DialogCondition } from "./dialogCondition";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -59,6 +60,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
         limit: 10,
     });
     const [playerIsDeleted, setPlayerIsDeleted] = useState<Player | null>(null);
+    const [playerConditionChanged, setPlayerConditionChanged] = useState<Player | null>(null);
 
     const visiblePlayers = useMemo(
         () => sortAscending ? players : [...players].reverse(),
@@ -175,7 +177,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                                             {
                                                 label: "Alterar Condição",
                                                 icon: <HeartPulse size={16} />,
-                                                onClick: () => alert("Alterar Condição"),
+                                                onClick: () => setPlayerConditionChanged(player),
                                             },
                                             {
                                                 label: "Comprar",
@@ -215,6 +217,15 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                     onCancel={() => setPlayerIsDeleted(null)}
                     onConfirm={() => { setPlayerIsDeleted(null) }}/>
             )}
+            {
+                playerConditionChanged && (
+                    <DialogCondition
+                        open={!!playerConditionChanged}
+                        onOpenChange={(open) => !open && setPlayerConditionChanged(null)}
+                        player={playerConditionChanged}
+                        onCancel={() => setPlayerConditionChanged(null)}
+                        onConfirm={() => { setPlayerConditionChanged(null) }}/>
+                )}
         </section>
     );
 }
