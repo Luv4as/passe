@@ -20,6 +20,7 @@ import { DialogCondition } from "./dialogCondition";
 import { DialogEdit } from "./dialogEdit";
 import { DrawerInfo } from "./drawerInfo";
 import { DialogBuy } from "./dialogBuy";
+import { SortOption, SortTable } from "./sortTable";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -47,14 +48,26 @@ function PaginationItem({ active, children }: { active?: boolean; children: Reac
     );
 }
 
+type PlayerSortValue = "name" | "marketValue-desc" | "marketValue-asc" | "age-asc" | "age-desc" | "position";
+
+const PLAYER_SORT_OPTIONS: SortOption<PlayerSortValue>[] = [
+    { label: "nome", value: "name" },
+    { label: "idade (maior para o menor)", value: "age-desc" },
+    { label: "idade (menor para o maior)", value: "age-asc" },
+    { label: "valor de mercado (maior para o menor)", value: "marketValue-desc" },
+    { label: "valor de mercado (menor para o maior)", value: "marketValue-asc" },
+    { label: "posição", value: "position" },
+];
+
 interface PlayersTableProps {
     filters?: Pick<TableDataOptions, "search" | "position" | "condition" | "clubId" | "minAge" | "maxAge" | "minValue" | "maxValue">;
 }
 
 export default function PlayersTable({ filters = {} }: PlayersTableProps) {
     const [tab, setTab] = useState<"Todos" | "Livres" | "Em clubes">("Todos");
-    const [sortAscending, setSortAscending] = useState(true);
+    const [sortOption, setSortOption] = useState<PlayerSortValue>("name");
     const [page, setPage] = useState(1);
+
     const { players, totalItems, totalPages, loading, error } = useTableData({
         ...filters,
         free: tab === "Todos" ? undefined : tab === "Livres",
@@ -68,10 +81,24 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
     const [playerDetails, setPlayerDetails] = useState<Player | null>(null);
     const [playerToBuy, setPlayerToBuy] = useState<Player | null>(null);
 
-    const visiblePlayers = useMemo(
-        () => sortAscending ? players : [...players].reverse(),
-        [players, sortAscending],
-    );
+    const visiblePlayers = useMemo(() => {
+        const sorted = [...players];
+        switch (sortOption) {
+            case "age-desc":
+                return sorted.sort((a, b) => b.age - a.age);
+            case "age-asc":
+                return sorted.sort((a, b) => a.age - b.age);
+            case "marketValue-desc":
+                return sorted.sort((a, b) => b.marketValue - a.marketValue);
+            case "marketValue-asc":
+                return sorted.sort((a, b) => a.marketValue - b.marketValue);
+            case "position":
+                return sorted.sort((a, b) => a.position.localeCompare(b.position));
+            case "name":
+            default:
+                return sorted.sort((a, b) => a.name.localeCompare(b.name));
+        }
+    }, [players, sortOption]);
 
     function changeTab(nextTab: "Todos" | "Livres" | "Em clubes") {
         setTab(nextTab);
@@ -96,15 +123,11 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                         );
                     })}
                 </div>
-                <button
-                    type="button"
-                    onClick={() => setSortAscending((value) => !value)}
-                    className="flex h-9 w-42.25 items-center gap-2 rounded-lg border border-input bg-background px-3 body-sm text-foreground"
-                >
-                    <ArrowDownUp size={16} className="text-muted-foreground" />
-                    <span className="flex-1 overflow-hidden text-left text-ellipsis whitespace-nowrap">Ordenar: nome</span>
-                    <ChevronDown size={16} className="text-muted-foreground" />
-                </button>
+                <SortTable
+                options={PLAYER_SORT_OPTIONS}
+                value={sortOption}
+                onChange={setSortOption}
+                />
             </header>
 
             <div className="overflow-x-auto">
