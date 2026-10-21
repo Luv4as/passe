@@ -220,6 +220,7 @@ export class PlayersService {
     async findOne(id: number) {
         const player = await this.prisma.jogadores.findFirst({
             where: { id, excluido_em: null },
+            include: { clube: true },
         });
 
         if (!player) {

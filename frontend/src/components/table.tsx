@@ -18,6 +18,7 @@ import { Dropdown } from "./dropdown";
 import DialogDelete from "./dialogDelete";
 import { DialogCondition } from "./dialogCondition";
 import { DialogEdit } from "./dialogEdit";
+import { DrawerInfo } from "./drawerInfo";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -63,6 +64,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
     const [playerIsDeleted, setPlayerIsDeleted] = useState<Player | null>(null);
     const [playerConditionChanged, setPlayerConditionChanged] = useState<Player | null>(null);
     const [playerEdited, setPlayerEdited] = useState<Player | null>(null);
+    const [playerDetails, setPlayerDetails] = useState<Player | null>(null);
 
     const visiblePlayers = useMemo(
         () => sortAscending ? players : [...players].reverse(),
@@ -169,7 +171,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                                             {
                                                 label: "Ver detalhes",
                                                 icon: <Eye size={16} />,
-                                                onClick: () => alert("Ver detalhes"),
+                                                onClick: () => setPlayerDetails(player),
                                             },
                                             {
                                                 label: "Editar",
@@ -235,6 +237,17 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                         onOpenChange={(open) => !open && setPlayerEdited(null)}
                         player={playerEdited}
                         onConfirm={() => { setPlayerEdited(null) }} />
+                )
+            }
+            {
+                playerDetails && (
+                    <DrawerInfo
+                        player={playerDetails}
+                        open={true}
+                        onOpenChange={(open) => {
+                            if (!open) setPlayerDetails(null);
+                        }}
+                    />
                 )
             }
         </section>

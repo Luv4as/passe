@@ -18,6 +18,8 @@ export class PlayerMapper {
       potential: player.potencial,
       overall: overall,
       club_id: player.clube_id ?? null,
+      club_name: player.clube?.nome ?? null,
+      club_code: player.clube?.sigla ?? null,
     };
   }
 
