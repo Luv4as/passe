@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Shield } from "lucide-react";
 import Link from "next/link";
 import { ClubItem } from "@/src/hooks/useGetClubs";
 import { formatCoins } from "../lib/utils";
 import { SortOption, SortTable } from "./sortTable";
+import { IconContainer } from "@/components/ui/icon-container";
+import { DialogNewClub } from "./dialogNewClub";
 
 interface ClubsTableProps {
     clubs: ClubItem[];
@@ -80,8 +82,15 @@ export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
                             </tr>
                         ) : sortedClubs.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="h-28 text-center text-muted-foreground">
-                                    Nenhum clube cadastrado.
+                                <td colSpan={6} className="py-12 text-center">
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
+                                            <Shield size={24} className="text-muted-foreground" />
+                                        </IconContainer>
+                                        <p className="heading-card text-foreground font-semibold mt-1">Nenhum clube cadastrado</p>
+                                        <p className="body-sm text-muted-foreground max-w-sm">Crie o primeiro clube com nome e sigla. Ele começa com 300,00 em caixa e sem jogadores.</p>
+                                        <DialogNewClub />
+                                    </div>
                                 </td>
                             </tr>
                         ) : (

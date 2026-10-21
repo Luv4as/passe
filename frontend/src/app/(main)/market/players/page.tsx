@@ -12,8 +12,7 @@ export default function PlayersPage() {
 
     useEffect(() => {
         setHeaderAction(
-            <DialogNewPlayer>
-            </DialogNewPlayer>
+            <DialogNewPlayer/>
         );
         return () => setHeaderAction(null);
     }, [setHeaderAction]);

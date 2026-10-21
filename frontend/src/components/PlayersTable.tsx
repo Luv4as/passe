@@ -9,6 +9,7 @@ import {
     Pencil,
     HeartPulse,
     Trash2,
+    Users,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/useTableData";
@@ -19,6 +20,9 @@ import { DialogEdit } from "./dialogEdit";
 import { DrawerInfo } from "./drawerInfo";
 import { DialogBuy } from "./dialogBuy";
 import { SortOption, SortTable } from "./sortTable";
+import { IconContainer } from "@/components/ui/icon-container";
+import { DialogNewClub } from "./dialogNewClub";
+import { DialogNewPlayer } from "./dialogNewPlayer";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -150,7 +154,18 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                         ) : error ? (
                             <tr><td colSpan={10} className="h-28 text-center text-destructive">{error}</td></tr>
                         ) : visiblePlayers.length === 0 ? (
-                            <tr><td colSpan={10} className="h-28 text-center text-muted-foreground">Nenhum jogador encontrado.</td></tr>
+                            <tr>
+                                <td colSpan={10} className="py-12 text-center">
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
+                                            <Users size={24} className="text-muted-foreground" />
+                                        </IconContainer>
+                                        <p className="heading-card text-foreground font-semibold mt-1">Nenhum jogador cadastrado</p>
+                                        <p className="body-sm text-muted-foreground max-w-sm">Crie o primeiro jogador com nome e posição. Ele começa com 100,00 em caixa e sem clube.</p>
+                                        <DialogNewPlayer/>
+                                    </div>
+                                </td>
+                            </tr>
                         ) : visiblePlayers.map((player) => (
                             <tr key={player.name} className="h-14 border-b border-border last:border-b-0">
                                 <td className="px-4">
