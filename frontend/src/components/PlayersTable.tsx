@@ -1,10 +1,8 @@
 "use client";
 
 import {
-    ArrowDownUp,
     ChevronLeft,
     ChevronRight,
-    ChevronDown,
     MoreHorizontal,
     ShoppingCart,
     Eye,

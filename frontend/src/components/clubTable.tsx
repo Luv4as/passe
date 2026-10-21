@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDownUp, ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { ClubItem } from "@/src/hooks/useGetClubs";
 import { formatCoins } from "../lib/utils";
