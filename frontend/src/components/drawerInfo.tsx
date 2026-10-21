@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { StatsDrawer } from "./statsDrawer";
 import { DialogCondition } from "./dialogCondition";
 import { DialogEdit } from "./dialogEdit";
+import { DialogBuy } from "./dialogBuy";
 
 interface DrawerInfoProps {
     open: boolean;
@@ -22,6 +23,7 @@ export function DrawerInfo({ open, onOpenChange, player }: DrawerInfoProps) {
     const { getPlayer, playerData, loading, error } = useGetPlayer()
     const [playerEdited, setPlayerEdited] = useState<Player | null>(null);
     const [playerConditionChanged, setPlayerConditionChanged] = useState<Player | null>(null);
+    const [playerToBuy, setPlayerToBuy] = useState<Player | null>(null);
 
     useEffect(() => {
         if (open && player?.id) {
@@ -139,9 +141,7 @@ export function DrawerInfo({ open, onOpenChange, player }: DrawerInfoProps) {
                         </Button>
                         <Button
                             className="flex-1 min-w-0 bg-primary text-primary-foreground"
-                            onClick={() => {
-
-                            }}>
+                            onClick={() => setPlayerToBuy(player)}>
                             <ShoppingCart size={16} />
                             <span className="truncate">Comprar</span>
                         </Button>
@@ -164,6 +164,15 @@ export function DrawerInfo({ open, onOpenChange, player }: DrawerInfoProps) {
                         onOpenChange={(open) => !open && setPlayerEdited(null)}
                         player={playerEdited}
                         onConfirm={() => { setPlayerEdited(null) }} />
+                )
+            }
+            {
+                playerToBuy && (
+                    <DialogBuy
+                        open={!!playerToBuy}
+                        onOpenChange={(open) => !open && setPlayerToBuy(null)}
+                        player={playerToBuy}
+                        onConfirm={() => { setPlayerToBuy(null) }} />
                 )
             }
         </Drawer>

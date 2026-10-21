@@ -9,8 +9,28 @@ export interface BuyPlayerForm {
     hora: string;
 }
 
+export interface BuyTransactionResponse {
+    id: number;
+    club_id: number;
+    player_id: number;
+    player_name: string;
+    type: string;
+    value: number;
+    fee: number;
+    penalty: number;
+    profit: number | null;
+    cash_change: number;
+    created_at: string;
+    contract: {
+        purchase_value: number;
+        loyalty_until: string;
+        status: string;
+    };
+    club_cash: number;
+}
+
 interface UseChangeConditionOptions {
-    onSuccess?: () => void;
+    onSuccess?: (data: BuyTransactionResponse) => void;
 }
 
 export function useBuyPlayer(player: Player, options?: UseChangeConditionOptions) {
@@ -41,10 +61,19 @@ export function useBuyPlayer(player: Player, options?: UseChangeConditionOptions
         setError(null);
 
         try {
-            const loyaltyUntil = `${form.data}T${form.hora}-03:00`;
+            let [hours, minutes] = form.hora.split(":");
+            const h = Number(hours);
+
+            if (h >= 21) {
+                hours = "20";
+                minutes = "59";
+            }
+
+            const timeOnly = `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+            const loyaltyUntil = `${form.data}T${timeOnly}-03:00`;
             const playerId = player.id;
 
-            await fetchApi(`/players/${playerId}/buy`, {
+            const response = await fetchApi<BuyTransactionResponse>(`/players/${playerId}/buy`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -54,7 +83,7 @@ export function useBuyPlayer(player: Player, options?: UseChangeConditionOptions
                     loyalty_until: loyaltyUntil
                 }),
             });
-            options?.onSuccess?.();
+            options?.onSuccess?.(response);
             return true;
         } catch (error) {
             const errorMessage = error instanceof Error

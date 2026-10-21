@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { fetchApi } from "@/src/lib/api";
 import { type PlayerStats } from "../components/statsPreview";
+import { PlayerCondition } from "./useTableData";
 
 export const positions = [
     ["GOL", "Goleiro"],
@@ -37,10 +38,25 @@ export const initialForm: PlayerForm = {
 };
 
 export interface CreatedPlayer {
+    id: number;
     name: string;
+    position: string;
+    age: number;
+    agility: number;
+    condition: PlayerCondition;
     base_value: number;
     market_value: number;
+    pace: number;
+    shooting: number;
+    passing: number;
+    dribbling: number;
+    defending: number;
+    physical: number;
+    potential: number;
     overall: number;
+    club_id: number | null;
+    club_name?: string | null;
+    club_code?: string | null;
 }
 
 interface UseCreatePlayerOptions {
@@ -69,7 +85,7 @@ export function useCreatePlayer(options?: UseCreatePlayerOptions) {
                 method: "POST",
                 body: JSON.stringify(form),
             });
-            
+
             resetForm();
             options?.onSuccess?.(player);
         } catch (submitError) {

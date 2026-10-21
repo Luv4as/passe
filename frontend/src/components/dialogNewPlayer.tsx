@@ -12,11 +12,53 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Info, LockKeyhole, Plus, UserRound } from "lucide-react";
+import { Eye, Info, LockKeyhole, Plus, UserRound } from "lucide-react";
 import { ReactElement, useState } from "react";
 import { StatsPreview } from "./statsPreview";
-import { DialogCreated } from "./dialogCreated";
 import { positions, useCreatePlayer, type CreatedPlayer } from "@/src/hooks/useCreatePlayer";
+import { DialogSucess } from "./dialogSucess";
+import { Player, PlayerCondition } from "../hooks/useTableData";
+import { DrawerInfo } from "./drawerInfo";
+
+function mapCreatedPlayerToPlayer(created: CreatedPlayer): Player {
+    const nameParts = created.name.trim().split(" ");
+    const initials = nameParts.length > 1
+        ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase()
+        : nameParts[0].substring(0, 2).toUpperCase();
+
+    const positionLabels: Record<string, string> = {
+        GOL: "Goleiro",
+        ZAG: "Zagueiro",
+        LAT: "Lateral",
+        MEI: "Meio-campo",
+        ATA: "Atacante",
+    };
+
+    return {
+        id: created.id,
+        name: created.name,
+        initials: initials,
+        position: created.position,
+        positionLabel: positionLabels[created.position] || created.position,
+        avatarClass: "bg-primary/10 text-primary font-bold",
+        age: created.age,
+        condition: (created.condition as PlayerCondition) ?? "APTO",
+        marketValue: created.market_value,
+        baseValue: created.base_value,
+        overall: created.overall,
+        potential: created.potential,
+        agility: created.agility,
+        pace: created.pace,
+        shooting: created.shooting,
+        passing: created.passing,
+        dribbling: created.dribbling,
+        defending: created.defending,
+        physical: created.physical,
+        clubId: created.club_id ?? null,
+        clubName: created.club_name ?? undefined,
+        clubCode: created.club_code ?? undefined,
+    };
+}
 
 function NumericField({ id, label, value, onChange, hint }: {
     id: string;
@@ -42,6 +84,7 @@ interface DialogNewPlayerProps {
 export function DialogNewPlayer({ children, onPlayerCreated }: DialogNewPlayerProps) {
     const [open, setOpen] = useState(false);
     const [createdPlayer, setCreatedPlayer] = useState<CreatedPlayer | null>(null);
+    const [drawerPlayer, setDrawerPlayer] = useState<Player | null>(null);
     const { form, saving, error, updateField, createPlayer } = useCreatePlayer({
         onSuccess: (player) => {
             setOpen(false);
@@ -53,6 +96,13 @@ export function DialogNewPlayer({ children, onPlayerCreated }: DialogNewPlayerPr
     function handleSubmit(event: React.SubmitEvent) {
         event.preventDefault();
         createPlayer();
+    }
+
+    function handleOpenDrawer() {
+        if (!createdPlayer) return;
+        const mappedPlayer = mapCreatedPlayerToPlayer(createdPlayer);
+        setDrawerPlayer(mappedPlayer);
+        setCreatedPlayer(null);
     }
 
     return (
@@ -205,12 +255,30 @@ export function DialogNewPlayer({ children, onPlayerCreated }: DialogNewPlayerPr
                     </form>
                 </DialogContent>
             </Dialog>
-            <DialogCreated
+            <DialogSucess
+                title="Jogador cadastrado"
+                description={`${createdPlayer?.name} entrou livre e Apto. Valores em moedas, calculados pela API ao salvar.`}
                 player={createdPlayer}
                 open={createdPlayer !== null}
                 onOpenChange={(isOpen) => {
                     if (!isOpen) setCreatedPlayer(null);
-                }} />
+                }}
+                primaryAction={{
+                    label: "Ver detalhes",
+                    icon: <Eye size={16} />,
+                    onClick: () => handleOpenDrawer(),
+                }}
+                closeText="Fechar"
+            />
+            {drawerPlayer && (
+                <DrawerInfo
+                    open={drawerPlayer !== null}
+                    onOpenChange={(isOpen) => {
+                        if (!isOpen) setDrawerPlayer(null);
+                    }}
+                    player={drawerPlayer}
+                />
+            )}
         </>
     );
 }
