@@ -1,5 +1,5 @@
 import { useToastManager } from "@/components/ui/toast";
-import { Player } from "../hooks/tableData";
+import { Player } from "../hooks/useTableData";
 import { useChangeCondition } from "../hooks/useChangeCondition";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CardPlayer } from "@/components/ui/card-player";

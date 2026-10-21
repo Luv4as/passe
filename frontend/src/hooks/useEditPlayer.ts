@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PlayerPosition } from "./useCreatePlayer";
-import { Player } from "./tableData";
+import { Player } from "./useTableData";
 import { fetchApi } from "../lib/api";
 
 export const positions = [
@@ -37,17 +37,17 @@ export function useEditPlayer(player?: Player, options?: UseEditPlayerOptions) {
         setForm((current) => ({ ...current, [key]: value }));
     }
 
-    async function editPlayer(playerId: number){
+    async function editPlayer(playerId: number) {
         setSaving(true);
         setError(null);
 
-        if(player && form.age < player.age){
+        if (player && form.age < player.age) {
             setError("A idade do jogador não pode ser menor que a idade atual.");
             setSaving(false);
             return false;
         }
 
-        try{
+        try {
             await fetchApi<void>(`/players/${playerId}`, {
                 method: "PUT",
                 body: JSON.stringify(form),
@@ -55,14 +55,14 @@ export function useEditPlayer(player?: Player, options?: UseEditPlayerOptions) {
 
             options?.onSuccess?.();
             return true;
-        }catch(error){
+        } catch (error) {
             setError(
-                error instanceof Error 
-                ? error.message 
-                : "Erro ao editar jogador."
+                error instanceof Error
+                    ? error.message
+                    : "Erro ao editar jogador."
             );
             return false
-        } finally{
+        } finally {
             setSaving(false);
         }
     }

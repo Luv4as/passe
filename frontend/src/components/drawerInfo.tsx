@@ -1,5 +1,5 @@
 import { Drawer, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
-import { Player } from "../hooks/tableData";
+import { Player } from "../hooks/useTableData";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { CardPlayer } from "@/components/ui/card-player";
 import { CardInfos } from "@/components/ui/card-infos";

@@ -1,6 +1,11 @@
-import { Player } from "@/src/hooks/tableData";
+import { Player } from "@/src/hooks/useTableData";
 
-export function CardPlayer({ player }: { player: Player }) {
+interface CardPlayerProps {
+    player: Player;
+    marketValue?: number;
+}
+
+export function CardPlayer({ player, marketValue }: CardPlayerProps) {
     return (
         <div className="w-full divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
             <div className="flex flex-row w-full justify-between gap-2 py-3 px-3.5">
@@ -17,19 +22,27 @@ export function CardPlayer({ player }: { player: Player }) {
                         </span>
                     </span>
                 </div>
-                {player.clubName ? (
-                    <div className="flex items-center gap-2 whitespace-nowrap">
-                        <span className="rounded bg-muted px-1 py-0.5 caption-xs-medium">
-                            {player.clubCode}
+                {marketValue ? (
+                    <div className="flex flex-col justify-end items-end whitespace-nowrap">
+                        <p className="caption-xs text-muted-foreground">Valor de Mercado</p>
+                        <span className="heading-card leading-4 text-foreground">
+                            {marketValue.toFixed(2).replace(".", ",")}
                         </span>
                     </div>
-                ) : (
-                    <div className="flex items-center gap-2 whitespace-nowrap">
-                        <span className="rounded-lg bg-muted px-2 py-1 caption-xs-medium">
-                            Livre
-                        </span>
-                    </div>
-                )}
+                ) :
+                    player.clubName ? (
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                            <span className="rounded bg-muted px-1 py-0.5 caption-xs-medium">
+                                {player.clubCode}
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                            <span className="rounded-lg bg-muted px-2 py-1 caption-xs-medium">
+                                Livre
+                            </span>
+                        </div>
+                    )}
             </div>
         </div>
     )

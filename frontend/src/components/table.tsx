@@ -13,12 +13,13 @@ import {
     Trash2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/tableData";
+import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/useTableData";
 import { Dropdown } from "./dropdown";
 import DialogDelete from "./dialogDelete";
 import { DialogCondition } from "./dialogCondition";
 import { DialogEdit } from "./dialogEdit";
 import { DrawerInfo } from "./drawerInfo";
+import { DialogBuy } from "./dialogBuy";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -65,6 +66,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
     const [playerConditionChanged, setPlayerConditionChanged] = useState<Player | null>(null);
     const [playerEdited, setPlayerEdited] = useState<Player | null>(null);
     const [playerDetails, setPlayerDetails] = useState<Player | null>(null);
+    const [playerToBuy, setPlayerToBuy] = useState<Player | null>(null);
 
     const visiblePlayers = useMemo(
         () => sortAscending ? players : [...players].reverse(),
@@ -159,7 +161,13 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                                         </div> :
                                         <div className="flex items-center gap-2 whitespace-nowrap">
                                             <span className="rounded-lg bg-muted px-2 py-1 caption-xs-medium">Livre</span>
-                                            <button type="button" className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-3"><ShoppingCart size={16} />Comprar</button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setPlayerToBuy(player)}
+                                                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-3 hover:bg-muted transition-colors">
+                                                <ShoppingCart size={16} />
+                                                Comprar
+                                            </button>
                                         </div>
                                     }
                                 </td>
@@ -248,6 +256,15 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                             if (!open) setPlayerDetails(null);
                         }}
                     />
+                )
+            }
+            {
+                playerToBuy && (
+                    <DialogBuy
+                        open={!!playerToBuy}
+                        onOpenChange={(open) => !open && setPlayerToBuy(null)}
+                        player={playerToBuy}
+                        onConfirm={() => { setPlayerToBuy(null) }} />
                 )
             }
         </section>

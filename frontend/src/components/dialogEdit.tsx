@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { UserRound } from "lucide-react";
 import { positions } from "../hooks/useCreatePlayer";
-import { Player } from "../hooks/tableData";
+import { Player } from "../hooks/useTableData";
 import { useToastManager } from "@/components/ui/toast";
 import { useEditPlayer } from "../hooks/useEditPlayer";
 

@@ -1,10 +1,10 @@
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Badge } from "@/components/ui/badge";
 import { HeartPulse, Shield, Search, Shirt, UserRound, Coins, X } from "lucide-react";
-import { Dropdown } from "./combobox";
+import { ComboboxFilter, } from "./comboboxFilter";
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/src/lib/api";
-import type { TableDataOptions } from "@/src/hooks/tableData";
+import type { TableDataOptions } from "@/src/hooks/useTableData";
 
 export type TableFilters = Pick<TableDataOptions, "search" | "position" | "condition" | "clubId" | "minAge" | "maxAge" | "minValue" | "maxValue">;
 
@@ -97,25 +97,25 @@ export function TableFilter({ filters, onFiltersChange }: TableFilterProps) {
                         <Search />
                     </InputGroupAddon>
                 </InputGroup>
-                <Dropdown
+                <ComboboxFilter
                     icon={<Shirt className="h-4 w-4" />}
                     placeholder="Posição"
                     value={filters.position}
                     onValueChange={(value) => updateFilter({ position: value || undefined })}
                     opcoes={["GOL", "ZAG", "LAT", "MEI", "ATA"]} />
-                <Dropdown
+                <ComboboxFilter
                     icon={<HeartPulse className="h-4 w-4" />}
                     placeholder="Condição"
                     value={filters.condition}
                     onValueChange={(value) => updateFilter({ condition: value ? value as TableDataOptions["condition"] : undefined })}
                     opcoes={["APTO", "MAL_CONDICIONADO", "DOENTE"]} />
-                <Dropdown
+                <ComboboxFilter
                     icon={<Shield className="h-4 w-4" />}
                     placeholder="Clube"
                     value={clubs.find((club) => club.id === filters.clubId)?.name}
                     onValueChange={(value) => updateFilter({ clubId: clubs.find((club) => club.name === value)?.id })}
                     opcoes={clubs.map((club) => club.name)} />
-                <Dropdown
+                <ComboboxFilter
                     icon={<UserRound className="h-4 w-4" />}
                     placeholder="Idade"
                     value={ageRanges.find((range) => range.minAge === filters.minAge && range.maxAge === filters.maxAge)?.label}
@@ -124,7 +124,7 @@ export function TableFilter({ filters, onFiltersChange }: TableFilterProps) {
                         updateFilter(range ? { minAge: range.minAge, maxAge: range.maxAge } : { minAge: undefined, maxAge: undefined });
                     }}
                     opcoes={ageRanges.map((range) => range.label)} />
-                <Dropdown
+                <ComboboxFilter
                     icon={<Coins className="h-4 w-4" />}
                     placeholder="Valor de Mercado"
                     value={valueRanges.find((range) => range.minValue === filters.minValue && range.maxValue === filters.maxValue)?.label}

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Trash } from "lucide-react";
-import { Player } from "../hooks/tableData";
+import { Player } from "../hooks/useTableData";
 import { useDeletePlayer } from "../hooks/useDeletePlayer";
 import { useToastManager } from "@/components/ui/toast";
 import { CardPlayer } from "@/components/ui/card-player";

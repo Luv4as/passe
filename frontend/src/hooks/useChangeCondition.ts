@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { fetchApi } from "../lib/api";
-import { type PlayerCondition } from "./tableData";
+import { type PlayerCondition } from "./useTableData";
 
 interface UseChangeConditionOptions {
     onSuccess?: () => void;
@@ -21,7 +21,7 @@ export function useChangeCondition(options?: UseChangeConditionOptions) {
             options?.onSuccess?.();
             return true;
         } catch (error) {
-           const errorMessage = error instanceof Error ? error.message : "Não foi possível alterar a condição do jogador.";
+            const errorMessage = error instanceof Error ? error.message : "Não foi possível alterar a condição do jogador.";
             setError(errorMessage);
             return false;
         } finally {
