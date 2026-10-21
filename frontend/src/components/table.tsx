@@ -17,6 +17,7 @@ import { Player, useTableData, type PlayerCondition, type TableDataOptions } fro
 import { Dropdown } from "./dropdown";
 import DialogDelete from "./dialogDelete";
 import { DialogCondition } from "./dialogCondition";
+import { DialogEdit } from "./dialogEdit";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -61,6 +62,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
     });
     const [playerIsDeleted, setPlayerIsDeleted] = useState<Player | null>(null);
     const [playerConditionChanged, setPlayerConditionChanged] = useState<Player | null>(null);
+    const [playerEdited, setPlayerEdited] = useState<Player | null>(null);
 
     const visiblePlayers = useMemo(
         () => sortAscending ? players : [...players].reverse(),
@@ -172,7 +174,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                                             {
                                                 label: "Editar",
                                                 icon: <Pencil size={16} />,
-                                                onClick: () => alert("Editar"),
+                                                onClick: () => setPlayerEdited(player),
                                             },
                                             {
                                                 label: "Alterar Condição",
@@ -215,7 +217,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                     onOpenChange={(open) => !open && setPlayerIsDeleted(null)}
                     player={playerIsDeleted}
                     onCancel={() => setPlayerIsDeleted(null)}
-                    onConfirm={() => { setPlayerIsDeleted(null) }}/>
+                    onConfirm={() => { setPlayerIsDeleted(null) }} />
             )}
             {
                 playerConditionChanged && (
@@ -224,8 +226,17 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                         onOpenChange={(open) => !open && setPlayerConditionChanged(null)}
                         player={playerConditionChanged}
                         onCancel={() => setPlayerConditionChanged(null)}
-                        onConfirm={() => { setPlayerConditionChanged(null) }}/>
+                        onConfirm={() => { setPlayerConditionChanged(null) }} />
                 )}
+            {
+                playerEdited && (
+                    <DialogEdit
+                        open={!!playerEdited}
+                        onOpenChange={(open) => !open && setPlayerEdited(null)}
+                        player={playerEdited}
+                        onConfirm={() => { setPlayerEdited(null) }} />
+                )
+            }
         </section>
     );
 }
