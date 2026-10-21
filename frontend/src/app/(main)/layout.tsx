@@ -3,10 +3,9 @@
 import { Badge } from "@/components/ui/badge";
 import { IconContainer } from "@/components/ui/icon-container";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { SvgIcon } from "@/components/ui/svg-icon";
 import { AppSidebar } from "@/src/components/sidebar";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ListOrderedIcon, Shield, Swords, Users } from "lucide-react";
 import { usePathname } from "next/dist/client/components/navigation";
 
 export default function MainLayout({
@@ -59,20 +58,20 @@ export default function MainLayout({
         return "Gerenciamento completo da liga de futebol.";
     };
 
-    const getPageIcon = () => {
+    const getPageIcon = (): React.ReactNode => {
         if (segments.includes("players")) {
-            return "/jogadores.svg";
+            return <Users className="h-6 w-6 text-primary" />;
         }
         if (segments.includes("clubs")) {
-            return "/clube.svg";
+            return <Shield className="h-6 w-6 text-primary" />;
         }
         if (segments.includes("matches")) {
-            return "/partidas.svg";
+            return <Swords className="h-6 w-6 text-primary" />;
         }
         if (segments.includes("standings")) {
-            return "/classificacao.svg";
+            return <ListOrderedIcon className="h-6 w-6 text-primary" />;
         }
-        return "/jogadores.svg";
+        return <Users className="h-6 w-6 text-primary" />;
     }
 
     return (
@@ -99,7 +98,7 @@ export default function MainLayout({
                         <div className="flex flex-row items-center gap-4">
                             <div>
                                 <IconContainer className=" bg-primary-soft border border-primary h-12 w-12 ">
-                                    <SvgIcon src={getPageIcon()} className="bg-primary h-6 w-6" />
+                                    {getPageIcon()}
                                 </IconContainer>
                             </div>
                             <div className="flex flex-col gap-1">

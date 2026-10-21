@@ -1,5 +1,5 @@
+import { Clock, Swords, Trophy } from "lucide-react";
 import { IconContainer } from "./icon-container";
-import { SvgIcon } from "./svg-icon";
 
 interface LeagueBasicsProps {
     className?: string;
@@ -17,10 +17,7 @@ export default function LeagueBasics({ className, leagueName, lastMatch, clubs, 
         >
             <div className="flex w-full items-center gap-2.5">
                 <IconContainer>
-                    <SvgIcon
-                        src="/liga.svg"
-                        className="bg-muted-foreground"
-                    />
+                    <Trophy size={16} />
                 </IconContainer>
                 <div className="flex min-w-0 flex-1 flex-col items-start whitespace-nowrap">
                     <p className="text-sm font-medium leading-5 text-foreground">
@@ -34,10 +31,7 @@ export default function LeagueBasics({ className, leagueName, lastMatch, clubs, 
 
             <div className="flex w-full items-center gap-2.5">
                 <IconContainer>
-                    <SvgIcon
-                        src="/partidas.svg"
-                        className="bg-muted-foreground"
-                    />
+                    <Swords size={16} />
                 </IconContainer>
                 <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5">
                     <p className="whitespace-nowrap text-sm font-medium leading-5 text-foreground">
@@ -53,10 +47,7 @@ export default function LeagueBasics({ className, leagueName, lastMatch, clubs, 
 
             <div className="flex w-full items-center justify-between">
                 <div className="flex shrink-0 items-center gap-1.5">
-                    <SvgIcon
-                        src="/relogio.svg"
-                        className="bg-muted-foreground"
-                    />
+                    <Clock size={16}/>
                     <p className="whitespace-nowrap text-xs font-normal leading-4 text-muted-foreground">
                         Horário de Brasília (UTC−3)
                     </p>

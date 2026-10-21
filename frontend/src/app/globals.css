@@ -335,4 +335,11 @@
   .caption-xs-medium {
     @apply text-xs font-medium leading-normal text-foreground;
   }
+
+}
+
+@layer base {
+  body {
+    position: relative;
+  }
 }

@@ -16,10 +16,10 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SvgIcon } from "@/components/ui/svg-icon";
 import { ClubSidebar } from "@/components/ui/club-sidebar";
 import LeagueBasics from "@/components/ui/league-basics";
 import { useSidebarData } from "../hooks/useSidebarData";
+import { ListOrderedIcon, Shield, Swords, Users } from "lucide-react";
 
 export function AppSidebar() {
     const pathname = usePathname();
@@ -57,12 +57,11 @@ export function AppSidebar() {
                                     tooltip="Jogadores"
                                     isActive={pathname === "/market/players" || pathname === "/"}
                                 >
-                                    <SvgIcon
-                                        src="/jogadores.svg"
+                                    <Users
+                                        size={16}
                                         className={pathname === "/market/players" || pathname === "/"
-                                            ? "bg-primary"
-                                            : "bg-muted-foreground"}
-                                    />
+                                            ? "text-primary"
+                                            : "text-muted-foreground"} />
                                     <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname === "/market/players" || pathname === "/"
                                         ? "body-sm-medium text-sidebar-foreground"
                                         : "body-sm text-sidebar-foreground"
@@ -81,12 +80,10 @@ export function AppSidebar() {
                                     tooltip="Clubes"
                                     isActive={pathname.startsWith("/market/clubs")}
                                 >
-                                    <SvgIcon
-                                        src="/clube.svg"
+                                    <Shield size={16}
                                         className={pathname.startsWith("/market/clubs")
-                                            ? "bg-primary"
-                                            : "bg-muted-foreground"}
-                                    />
+                                            ? "text-primary"
+                                            : "text-muted-foreground"} />
                                     <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname.startsWith("/market/clubs")
                                         ? "body-sm-medium text-sidebar-foreground"
                                         : "body-sm text-sidebar-foreground"
@@ -114,11 +111,11 @@ export function AppSidebar() {
                                     tooltip="Partidas"
                                     isActive={pathname.startsWith("/league/matches")}
                                 >
-                                    <SvgIcon
-                                        src="/partidas.svg"
+                                    <Swords
+                                        size={16}
                                         className={pathname.startsWith("/league/matches")
-                                            ? "bg-primary"
-                                            : "bg-muted-foreground"}
+                                            ? "text-primary"
+                                            : "text-muted-foreground"}
                                     />
                                     <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname.startsWith("/league/matches")
                                         ? "body-sm-medium text-sidebar-foreground"
@@ -138,11 +135,11 @@ export function AppSidebar() {
                                     tooltip="Classificação"
                                     isActive={pathname === "/league/standings"}
                                 >
-                                    <SvgIcon
-                                        src="/classificacao.svg"
+                                    <ListOrderedIcon
+                                        size={16}
                                         className={pathname === "/league/standings"
-                                            ? "bg-primary"
-                                            : "bg-muted-foreground"}
+                                            ? "text-primary"
+                                            : "text-muted-foreground"}
                                     />
                                     <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname === "/league/standings"
                                         ? "body-sm-medium text-primary"
@@ -184,7 +181,7 @@ export function AppSidebar() {
 
             <SidebarFooter className="px-4 py-3 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                 <div className="w-full group-data-[collapsible=icon]:hidden">
-                    <LeagueBasics 
+                    <LeagueBasics
                         clubs={clubsCount}
                         players={playersCount}
                         leagueName="Liga Fictícia"
@@ -193,7 +190,7 @@ export function AppSidebar() {
                 </div>
                 <div className="hidden group-data-[collapsible=icon]:flex justify-center">
                     <SidebarMenuButton tooltip="Resumo da liga" className="size-8">
-                        <SvgIcon src="/liga.svg" className="bg-muted-foreground" />
+                        <Swords size={16} />
                     </SidebarMenuButton>
                 </div>
             </SidebarFooter>
