@@ -46,8 +46,8 @@ export default function MainLayout({
         }
         if (isClubs) {
             return isDynamicClub
-                ? "Cada clube começa com 300,00 em caixa e sem jogadores. A liga aceita no máximo 20 clubes."
-                : "Stats do clube";
+                ? "Stats do clube"
+                : "Cada clube começa com 300,00 em caixa e sem jogadores. A liga aceita no máximo 20 clubes.";
         }
         if (segments.includes("matches")) {
             return "Jogue partidas entre clubes com os 5 titulares escalados e acompanhe o histórico.";

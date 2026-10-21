@@ -1,7 +1,7 @@
 'use client'
 
 import { DialogNewPlayer } from "@/src/components/dialogNewPlayer";
-import PlayersTable from "@/src/components/table";
+import PlayersTable from "@/src/components/PlayersTable";
 import { TableFilter, type TableFilters } from "@/src/components/tableFilter";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useEffect, useState } from "react";
