@@ -5,6 +5,7 @@ import { ArrowDownUp, ChevronRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { ClubItem } from "@/src/hooks/useGetClubs";
 import { formatCoins } from "../lib/utils";
+import { SortOption, SortTable } from "./sortTable";
 
 interface ClubsTableProps {
     clubs: ClubItem[];
@@ -12,12 +13,17 @@ interface ClubsTableProps {
     error?: string | null;
 }
 
-type SortOption = "name" | "patrimony-desc" | "patrimony-asc";
+type ClubSortValue = "name" | "patrimony-desc" | "patrimony-asc";
+
+const CLUB_SORT_OPTIONS: SortOption<ClubSortValue>[] = [
+    { label: "Patrimônio (maior para o menor)", value: "patrimony-desc" },
+    { label: "Patrimônio (menor para o maior)", value: "patrimony-asc" },
+    { label: "Nome", value: "name" },
+];
 
 export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
-    const [sortOption, setSortOption] = useState<SortOption>("patrimony-desc");
+    const [sortOption, setSortOption] = useState<ClubSortValue>("patrimony-desc");
 
-    // Ordenação local conforme a escolha
     const sortedClubs = [...clubs].sort((a, b) => {
         const equityA = a.cash + (a.squadValue ?? 0);
         const equityB = b.cash + (b.squadValue ?? 0);
@@ -33,7 +39,6 @@ export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
 
     return (
         <section className="w-full overflow-hidden rounded-xl border border-border bg-card">
-            {/* Header da Tabela com Filtro/Ordenação */}
             <header className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
                 <div className="flex items-center gap-2">
                     <span className="body-sm-semibold text-foreground">{clubs.length} clubes</span>
@@ -42,22 +47,12 @@ export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
                     </span>
                 </div>
 
-                <div className="relative">
-                    <select
-                        value={sortOption}
-                        onChange={(e) => setSortOption(e.target.value as SortOption)}
-                        className="h-9 w-64 appearance-none rounded-lg border border-input bg-background pl-9 pr-8 body-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                    >
-                        <option value="patrimony-desc">Ordenar: patrimônio (maior para o menor)</option>
-                        <option value="patrimony-asc">Ordenar: patrimônio (menor para o maior)</option>
-                        <option value="name">Ordenar: Nome</option>
-                    </select>
-                    <ArrowDownUp size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                    <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                </div>
+                <SortTable
+                    options={CLUB_SORT_OPTIONS}
+                    value={sortOption}
+                    onChange={setSortOption} />
             </header>
 
-            {/* Conteúdo da Tabela */}
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse body-sm-medium">
                     <thead className="bg-muted text-muted-foreground">
@@ -67,7 +62,7 @@ export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
                             <th className="px-4 text-right">Caixa</th>
                             <th className="px-4 text-right">Valor do elenco</th>
                             <th className="px-4 text-right">Patrimônio</th>
-                            <th className="px-4 w-28" />
+                            <th className="px-4 text-right w-32" />
                         </tr>
                     </thead>
                     <tbody>
@@ -97,14 +92,14 @@ export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
                                     <tr key={club.id} className="h-14 border-b border-border last:border-b-0 hover:bg-muted/50 transition-colors">
                                         <td className="px-4">
                                             <div className="flex items-center gap-3">
-                                                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted caption-xs font-semibold text-foreground">
+                                                <span className="flex border border-border py-2 px-1 shrink-0 items-center justify-center rounded-lg bg-muted caption-xs-medium text-foreground">
                                                     {club.acronym}
                                                 </span>
-                                                <span className="font-semibold text-foreground">{club.name}</span>
+                                                <span className="body-sm-medium text-foreground">{club.name}</span>
                                             </div>
                                         </td>
                                         <td className="px-4">
-                                            <span className="rounded bg-muted px-2 py-0.5 caption-xs-medium font-semibold">
+                                            <span className="border border-border rounded-lg bg-muted px-2 py-0.5 caption-xs-medium">
                                                 {club.acronym}
                                             </span>
                                         </td>
@@ -114,14 +109,13 @@ export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
                                         <td className="px-4 text-right text-foreground body-sm">
                                             {formatCoins(club.squadValue ?? 0)}
                                         </td>
-                                        <td className="px-4 text-right font-bold text-foreground body-sm">
+                                        <td className="px-4 text-right text-foreground body-sm-medium">
                                             {formatCoins(equity)}
                                         </td>
-                                        <td className="px-4 text-right">
+                                        <td className="px-4 text-right whitespace-nowrap">
                                             <Link
                                                 href={`/market/clubs/${club.id}`}
-                                                className="inline-flex items-center gap-1 body-sm-semibold text-foreground hover:text-primary transition-colors"
-                                            >
+                                                className="inline-flex items-center gap-1 body-sm-semibold text-foreground hover:text-primary transition-colors">
                                                 Ver clube
                                                 <ChevronRight size={16} />
                                             </Link>
@@ -134,7 +128,6 @@ export function ClubsTable({ clubs = [], loading, error }: ClubsTableProps) {
                 </table>
             </div>
 
-            {/* Subtexto explicativo do footer exibido na imagem */}
             <footer className="border-t border-border px-4 py-3 caption-xs text-muted-foreground">
                 Clubes pelo nome por padrão ou pelo patrimônio, do maior para o menor, com empate desfeito pelo nome.
             </footer>
