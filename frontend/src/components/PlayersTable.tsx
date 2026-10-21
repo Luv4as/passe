@@ -21,7 +21,6 @@ import { DrawerInfo } from "./drawerInfo";
 import { DialogBuy } from "./dialogBuy";
 import { SortOption, SortTable } from "./sortTable";
 import { IconContainer } from "@/components/ui/icon-container";
-import { DialogNewClub } from "./dialogNewClub";
 import { DialogNewPlayer } from "./dialogNewPlayer";
 
 const conditionClasses: Record<PlayerCondition, string> = {
