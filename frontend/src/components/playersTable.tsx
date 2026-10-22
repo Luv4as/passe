@@ -229,7 +229,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                                             {
                                                 label: "Comprar",
                                                 icon: <ShoppingCart size={16} />,
-                                                onClick: () => alert("Comprar"),
+                                                onClick: () => setPlayerToBuy(player),
                                             },
                                             {
                                                 label: "Excluir",

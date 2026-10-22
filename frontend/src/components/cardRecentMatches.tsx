@@ -65,7 +65,7 @@ export function RecentMatchesCard() {
                 )}
 
                 <Link
-                    href="/market/matches"
+                    href="/league/matches"
                     className="inline-flex items-center justify-center gap-1.5 body-sm-semibold text-primary hover:underline pt-2"
                 >
                     Ver todas as partidas
