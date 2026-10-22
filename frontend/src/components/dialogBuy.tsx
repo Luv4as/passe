@@ -1,3 +1,4 @@
+'use client'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Player } from "../hooks/useTableData";
@@ -13,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DialogSucess } from "./dialogSucess";
 import { formatCoins, formatDate } from "../lib/utils";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 interface DialogBuyProps {
     open?: boolean;
@@ -24,6 +25,7 @@ interface DialogBuyProps {
 
 
 export function DialogBuy({ open, onOpenChange, onConfirm, player }: DialogBuyProps) {
+    const router = useRouter();
     const { getClubs, clubs, loading: loadingClubs } = useGetClubs();
     const [boughtPlayer, setBoughtPlayer] = useState<Player | null>(null);
     const [transaction, setTransaction] = useState<BuyTransactionResponse | null>(null);
@@ -170,7 +172,11 @@ export function DialogBuy({ open, onOpenChange, onConfirm, player }: DialogBuyPr
                 primaryAction={{
                     label: "Ver clube",
                     icon: <ArrowRight size={16} />,
-                    onClick: () => router.push(`/club/${purchasingClub?.id}`),
+                    onClick: () => {
+                        if(purchasingClub?.id) {
+                            router.push(`/market/clubs/${purchasingClub?.id}`);
+                        }
+                    },
                 }}
                 metrics={transaction ? [
                     {

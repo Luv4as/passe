@@ -1,8 +1,10 @@
 'use client'
 
 import { Badge } from "@/components/ui/badge";
+import { CardInfos } from "@/components/ui/card-infos";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useGetClub } from "@/src/hooks/useGetClub";
+import { Coins, Landmark, Shirt, Wallet } from "lucide-react";
 import { Suspense, use, useEffect } from "react";
 
 
@@ -10,7 +12,7 @@ interface ClubPageProps {
     params: Promise<{ id: string }>;
 }
 
- function ClubContent({ params }: ClubPageProps) {
+function ClubContent({ params }: ClubPageProps) {
     const { id } = use(params);
     const clubId = Number(id);
 
@@ -50,8 +52,34 @@ interface ClubPageProps {
     }
 
     return (
-        <div>
-            WIP
+        <div className="flex flex-col gap-4">
+            <div className="flex flex-row items-stretch justify-center gap-4">
+                <CardInfos
+                    title="Caixa"
+                    icon={<Wallet size={16} />}
+                    bigNumber={club.cash}
+                    unit="moedas"
+                    description="Só muda por compras e vendas" />
+                <CardInfos
+                    title="Valor do elenco"
+                    icon={<Coins size={16} />}
+                    bigNumber={club.squadValue}
+                    unit="moedas"
+                    description="Soma dos valores de mercado" />
+                <CardInfos
+                    title="Patrimonio"
+                    icon={<Landmark size={16} />}
+                    bigNumber={club.netWorth}
+                    unit="moedas"
+                    description="Caixa + valor do elenco" />
+                <CardInfos
+                    title="Elenco"
+                    icon={<Shirt size={16} />}
+                    bigNumber={club.players.length}
+                    unit="jogadores"
+                    description="Limite de 12 jogadores" />
+            </div>
+
         </div>
     )
 }

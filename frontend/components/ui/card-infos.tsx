@@ -9,7 +9,7 @@ interface CardInfosProps {
 }
 export function CardInfos({ title, icon, bigNumber, description, unit, className }: CardInfosProps) {
     return (
-        <div className={`flex flex-col gap-2 rounded-xl border border-border bg-card p-4 ${className || ""}`}>
+        <div className={`flex flex-col gap-2 rounded-xl w-full border border-border bg-card p-4 ${className || ""}`}>
             <div className="flex flex-row justify-between items-center gap-2">
                 <p className="body-sm-medium text-muted-foreground">{title}</p>
                 {icon}
