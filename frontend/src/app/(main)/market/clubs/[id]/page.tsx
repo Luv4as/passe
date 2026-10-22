@@ -1,10 +1,12 @@
 'use client'
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { CardInfos } from "@/components/ui/card-infos";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useGetClub } from "@/src/hooks/useGetClub";
-import { Coins, Landmark, Shirt, Wallet } from "lucide-react";
+import { Coins, Landmark, Shirt, ShoppingCart, Wallet } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Suspense, use, useEffect } from "react";
 
 
@@ -13,11 +15,12 @@ interface ClubPageProps {
 }
 
 function ClubContent({ params }: ClubPageProps) {
+    const router = useRouter();
     const { id } = use(params);
     const clubId = Number(id);
 
     const { getClub, club, loading, error } = useGetClub(clubId);
-    const { setHeaderAction, setCustomTitle } = useHeaderAction();
+    const { setHeaderAction, setHeaderDescription, setCustomTitle } = useHeaderAction();
 
     useEffect(() => {
         if (clubId) getClub(clubId);
@@ -26,7 +29,8 @@ function ClubContent({ params }: ClubPageProps) {
     useEffect(() => {
         if (club) {
             setCustomTitle(club.name);
-            setHeaderAction(
+
+            setHeaderDescription(
                 <div className="flex flex-row items-center gap-2">
                     <Badge variant="outline" className="border-border bg-background text-foreground">
                         Sigla {club.acronym}
@@ -36,12 +40,25 @@ function ClubContent({ params }: ClubPageProps) {
                     </Badge>
                 </div>
             );
+            setHeaderAction(
+                <div className="flex flex-row items-center gap-2">
+                    <Button
+                    type="button"
+                    onClick={() => 
+                        router.push(`/market/players`)
+                    }>
+                        <ShoppingCart size={16} />
+                        Comprar Jogadores
+                    </Button>
+                </div>
+            );
         }
         return () => {
             setHeaderAction(null);
+            setHeaderDescription(null);
             setCustomTitle(null);
         };
-    }, [club, setHeaderAction, setCustomTitle]);
+    }, [club, setHeaderAction, setHeaderDescription, setCustomTitle, router]);
 
     if (loading) {
         return <div className="py-12 text-center text-muted-foreground">Carregando detalhes do clube...</div>;

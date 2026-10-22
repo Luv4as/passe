@@ -1,6 +1,5 @@
 'use client'
 
-import { Badge } from "@/components/ui/badge";
 import { IconContainer } from "@/components/ui/icon-container";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/src/components/sidebar";
@@ -11,7 +10,7 @@ import { Suspense } from "react";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
 
-    const { headerAction, customTitle } = useHeaderAction();
+    const { headerAction, headerDescription, customTitle } = useHeaderAction();
     const pathname = usePathname();
     const segments = pathname.split("/").filter(Boolean);
 
@@ -62,9 +61,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         return <Users className="h-6 w-6 text-primary" />;
     };
 
-    const isStatsPage = getPageDescription() === "Stats do clube";
-    const currentTitle = customTitle ?? routeFormatted[routeFormatted.length - 1];
-
     return (
         <SidebarInset>
             <header className="flex h-14 items-center gap-2 border-b border-border px-4 shrink-0">
@@ -91,14 +87,14 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                         </div>
                         <div className="flex flex-col gap-1">
                             <h1 className="text-2xl heading">
-                                {currentTitle}
+                                {customTitle ?? routeFormatted[routeFormatted.length - 1]}
                             </h1>
                             <div className="body-sm text-muted-foreground">
-                                {isStatsPage ? headerAction : getPageDescription()}
+                                {headerDescription ?? getPageDescription()}
                             </div>
                         </div>
                     </div>
-                    {!isStatsPage && headerAction}
+                    {headerAction}
                 </div>
                 {children}
             </main>
