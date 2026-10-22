@@ -1,7 +1,21 @@
+'use client'
+
 import { CardLastMatch } from "@/src/components/cardLastMatch";
+import { DialogNewMatch } from "@/src/components/dialogNewMatch";
 import { MatchesTable } from "@/src/components/matchesTable";
+import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
+import { useEffect } from "react";
 
 export default function MatchesPage() {
+    const { setHeaderAction } = useHeaderAction();
+
+    useEffect(() => {
+        setHeaderAction(
+            <DialogNewMatch />
+        );
+        return () => setHeaderAction(null);
+    }, [setHeaderAction]);
+
     return (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">

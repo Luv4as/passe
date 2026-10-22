@@ -134,7 +134,7 @@ export function DialogNewMatch({ children, open: controlledOpen, onOpenChange, o
                             type="button"
                             variant="outline"
                             disabled={saving}
-                            onClick={() => onOpenChange?.(false)}>
+                            onClick={() => handleOpenChange?.(false)}>
                             Cancelar
                         </Button>
                         <Button

@@ -10,43 +10,41 @@ import {
     ComboboxList,
 } from "@/components/ui/combobox";
 import { InputGroupAddon } from "@/components/ui/input-group";
-import { ClubItem } from "@/src/hooks/useGetClubs";
 
 export interface ComboboxOptionItem {
     id: number | string;
     name: string;
     acronym?: string;
     cash?: number;
-    [key: string]: unknown;
 }
 
 interface ComboboxOptionsProps {
     placeholder?: string;
-    opcoes?: ComboboxOptionItem[] | string[];
+    opcoes?: ComboboxOptionItem[] | string[] | unknown[];
     icon?: React.ReactNode;
     value?: string;
     onValueChange?: (value: string) => void;
 }
 
 export function ComboboxOptions({ opcoes = [], placeholder, icon, value, onValueChange }: ComboboxOptionsProps) {
-
-
     const isObjectList = typeof opcoes[0] === "object" && opcoes[0] !== null;
+
     const items = isObjectList
-        ? (opcoes as ComboboxOptionItem[]).map((item) => String(item.id))
+        ? (opcoes as Record<string, unknown>[]).map((item) => String(item.id ?? ""))
         : (opcoes as string[]);
 
     const selectedItem = isObjectList
-        ? (opcoes as ComboboxOptionItem[]).find((item) => String(item.id) === value)
+        ? (opcoes as Record<string, unknown>[]).find((item) => String(item.id) === value)
         : null;
 
-    const renderInputValue = () => {
+    const renderInputValue = (): string => {
         if (!selectedItem) return value || "";
 
-        let label = selectedItem.name;
+        const nameStr = String(selectedItem.name ?? "");
+        let label = nameStr;
 
         if (selectedItem.acronym) {
-            label += ` (${selectedItem.acronym})`;
+            label += ` (${String(selectedItem.acronym)})`;
         }
 
         if (typeof selectedItem.cash === "number") {
@@ -66,11 +64,13 @@ export function ComboboxOptions({ opcoes = [], placeholder, icon, value, onValue
                 value={value || null}
                 onValueChange={(nextValue) => {
                     onValueChange?.(String(nextValue ?? ""));
-                }}>
+                }}
+            >
                 <ComboboxInput
                     className="w-full"
                     placeholder={placeholder}
-                    value={renderInputValue()}>
+                    value={renderInputValue()}
+                >
                     <InputGroupAddon>
                         {icon ? icon : <GlobeIcon className="h-4 w-4" />}
                     </InputGroupAddon>
@@ -81,19 +81,25 @@ export function ComboboxOptions({ opcoes = [], placeholder, icon, value, onValue
                     <ComboboxList>
                         {(itemId) => {
                             const option = isObjectList
-                                ? (opcoes as ComboboxOptionItem[]).find((item) => String(item.id) === itemId)
+                                ? (opcoes as Record<string, unknown>[]).find((item) => String(item.id) === itemId)
                                 : null;
+
+                            const name = option?.name ? String(option.name) : "";
+                            const acronym = option?.acronym ? String(option.acronym) : "";
+                            const cash = typeof option?.cash === "number" ? option.cash : null;
 
                             return (
                                 <ComboboxItem key={String(itemId)} value={String(itemId)}>
                                     {option ? (
                                         <div className="flex w-full items-center justify-between gap-2 py-0.5">
                                             <div className="flex items-center gap-2 truncate">
-                                                <span className="body-sm truncate">{option.name} ({option.acronym})</span>
+                                                <span className="body-sm truncate">
+                                                    {name} {acronym ? `(${acronym})` : ""}
+                                                </span>
                                             </div>
-                                            {typeof option.cash === "number" && (
+                                            {cash !== null && (
                                                 <span className="caption-xs font-semibold text-primary shrink-0">
-                                                    {option.cash.toLocaleString("pt-BR", {
+                                                    {cash.toLocaleString("pt-BR", {
                                                         style: "currency",
                                                         currency: "BRL",
                                                     })}

@@ -142,7 +142,7 @@ export function AppSidebar() {
                                             : "text-muted-foreground"}
                                     />
                                     <span className={`group-data-[collapsible=icon]:hidden body-sm ${pathname === "/league/standings"
-                                        ? "body-sm-medium text-primary"
+                                        ? "body-sm-medium text-sidebar-foreground"
                                         : "body-sm text-sidebar-foreground"
                                         }`}>
                                         Classificação
@@ -163,6 +163,9 @@ export function AppSidebar() {
                                 <SidebarMenuItem key={club.id} className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
                                     <Link href={`/market/clubs/${club.id}`} className="w-full">
                                         <ClubSidebar
+                                            className={pathname === `/market/clubs/${club.id}`
+                                                ? "bg-muted/50 text-foreground"
+                                                : "text-muted-foreground"}
                                             initial={club.nome.charAt(0).toUpperCase()}
                                             clubName={club.nome}
                                         />

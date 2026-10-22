@@ -3,14 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Shield } from "lucide-react";
+import { ChevronRight, RefreshCw, ServerOff, Shield, Swords } from "lucide-react";
 import { useGetMatches } from "@/src/hooks/useGetMatches";
 import { useGetClubs } from "@/src/hooks/useGetClubs";
 import { ComboboxOptions } from "./comboboxOptions";
+import { IconContainer } from "@/components/ui/icon-container";
+import { DialogNewMatch } from "./dialogNewMatch";
 
 export function MatchesTable() {
-    const { getMatches, matches, loading: loadingMatches } = useGetMatches();
-    const { getClubs, clubs, loading: loadingClubs } = useGetClubs();
+    const { getMatches, matches, loading: loadingMatches, error: errorMatches } = useGetMatches();
+    const { getClubs, clubs, loading: loadingClubs, error: errorClubs } = useGetClubs();
     const [selectedClubId, setSelectedClubId] = useState<string>("all");
 
     useEffect(() => {
@@ -95,10 +97,37 @@ export function MatchesTable() {
                                     Carregando histórico de partidas...
                                 </td>
                             </tr>
+                        ) : errorMatches || errorClubs ? (
+                            <tr>
+                                <td colSpan={6} className="py-8 text-center text-destructive">
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
+                                            <ServerOff size={24} className="text-muted-foreground" />
+                                        </IconContainer>
+                                        <p className="heading-card text-foreground font-semibold mt-1">Não foi possível carregar o histórico de partidas</p>
+                                        <p className="body-sm text-muted-foreground max-w-sm">Não foi possível carregar os dados. Verifique a conexão e tente de novo.</p>
+                                        <p className="body-sm text-destructive-soft">{errorMatches || errorClubs}</p>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => window.location.reload()}>
+                                            <RefreshCw size={16} />
+                                            Tentar novamente
+                                        </Button>
+                                    </div>
+                                    
+                                </td>
+                            </tr>
                         ) : filteredMatches.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="py-8 text-center text-muted-foreground">
-                                    Nenhuma partida registrada.
+                                <td colSpan={6} className="py-12 text-center">
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                        <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
+                                            <Swords size={24} className="text-muted-foreground" />
+                                        </IconContainer>
+                                        <p className="heading-card text-foreground font-semibold mt-1">Nenhuma partida jogada</p>
+                                        <p className="body-sm text-muted-foreground max-w-sm">Escale os 5 titulares de dois clubes e jogue a primeira partida. O resultado aparece aqui e na classificação.</p>
+                                        <DialogNewMatch />
+                                    </div>
                                 </td>
                             </tr>
                         ) : (

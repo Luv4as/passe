@@ -52,6 +52,9 @@ export function CardLastMatch() {
 
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 p-5 border border-border rounded-xl bg-card">
             <div />
+            {error && (
+                <div className="text-destructive-soft">Erro ao carregar a última partida.</div>
+            )}
             <div className="flex flex-row items-center gap-4 justify-center">
                 <div className="flex flex-col text-right">
                     <p className="heading-card text-foreground">{lastMatch.homeClubName}</p>
