@@ -90,7 +90,6 @@ export default function LandingPage() {
         </span>
       </div>
 
-      {/* Badge do Líder */}
       <div className="mb-6 z-10">
         <Badge variant="outline" className="border-border bg-background px-3 py-1 rounded-full text-muted-foreground flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
@@ -102,18 +101,15 @@ export default function LandingPage() {
         </Badge>
       </div>
 
-      {/* Título */}
       <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-foreground max-w-3xl leading-tight mb-4 z-10 text-center">
         Gestão da liga, do mercado à classificação
       </h1>
 
-      {/* Subtítulo */}
       <p className="body text-muted-foreground max-w-2xl mb-8 z-10 text-center">
         Cadastre jogadores, monte os clubes e negocie com contrato de fidelidade. Depois,
         escale os titulares e jogue partidas com placar calculatedo pelos atributos.
       </p>
 
-      {/* Ação */}
       <div className="flex flex-row items-center gap-3 mb-10 z-10">
         <Button
           size="lg"
@@ -130,7 +126,6 @@ export default function LandingPage() {
         </span>
       </div>
 
-      {/* Indicadores Dinâmicos */}
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 caption-xs text-muted-foreground mb-12 z-10">
         <div className="flex items-center gap-1.5">
           <Users size={14} className="text-muted-foreground" />
@@ -159,7 +154,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Passos do Guia */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 w-full z-10">
         <div className="flex flex-col text-left p-4 rounded-2xl border border-border bg-background/50 hover:bg-background transition-colors">
           <div className="flex items-center justify-between mb-3">
@@ -240,7 +234,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Fuso Horário */}
       <div className="mt-10 pt-6 border-t border-border/50 w-full flex items-center justify-center gap-2 caption-xs text-muted-foreground z-10">
         <Clock size={14} />
         <span>Liga Fictícia 2026 · Horário de Brasília (UTC-3)</span>
