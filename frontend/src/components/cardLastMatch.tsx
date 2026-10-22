@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useGetMatches } from "../hooks/useGetMatches";
 import { useEffect, useMemo } from "react";
-import { formatDate } from "../lib/utils";
 import { useGetClubs } from "../hooks/useGetClubs";
 
 export function CardLastMatch() {

@@ -12,9 +12,17 @@ import {
 import { InputGroupAddon } from "@/components/ui/input-group";
 import { ClubItem } from "@/src/hooks/useGetClubs";
 
+export interface ComboboxOptionItem {
+    id: number | string;
+    name: string;
+    acronym?: string;
+    cash?: number;
+    [key: string]: unknown;
+}
+
 interface ComboboxOptionsProps {
     placeholder?: string;
-    opcoes?: string[] | ClubItem[];
+    opcoes?: ComboboxOptionItem[] | string[];
     icon?: React.ReactNode;
     value?: string;
     onValueChange?: (value: string) => void;
@@ -22,14 +30,34 @@ interface ComboboxOptionsProps {
 
 export function ComboboxOptions({ opcoes = [], placeholder, icon, value, onValueChange }: ComboboxOptionsProps) {
 
-    const isClubList = typeof opcoes[0] === "object";
-    const items = isClubList
-        ? (opcoes as ClubItem[]).map((c) => String(c.id))
+
+    const isObjectList = typeof opcoes[0] === "object" && opcoes[0] !== null;
+    const items = isObjectList
+        ? (opcoes as ComboboxOptionItem[]).map((item) => String(item.id))
         : (opcoes as string[]);
 
-    const selectedClub = isClubList
-        ? (opcoes as ClubItem[]).find((c) => String(c.id) === value)
+    const selectedItem = isObjectList
+        ? (opcoes as ComboboxOptionItem[]).find((item) => String(item.id) === value)
         : null;
+
+    const renderInputValue = () => {
+        if (!selectedItem) return value || "";
+
+        let label = selectedItem.name;
+
+        if (selectedItem.acronym) {
+            label += ` (${selectedItem.acronym})`;
+        }
+
+        if (typeof selectedItem.cash === "number") {
+            const formattedCash = selectedItem.cash.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+            });
+            label += ` · ${formattedCash}`;
+        }
+        return label;
+    };
 
     return (
         <div className="flex flex-row items-center gap-2 w-full">
@@ -42,14 +70,7 @@ export function ComboboxOptions({ opcoes = [], placeholder, icon, value, onValue
                 <ComboboxInput
                     className="w-full"
                     placeholder={placeholder}
-                    value={
-                        selectedClub
-                            ? `${selectedClub.name} (${selectedClub.acronym}) · ${selectedClub.cash.toLocaleString("pt-BR", {
-                                style: "currency",
-                                currency: "BRL",
-                            })} `
-                            : value || ""
-                    }>
+                    value={renderInputValue()}>
                     <InputGroupAddon>
                         {icon ? icon : <GlobeIcon className="h-4 w-4" />}
                     </InputGroupAddon>
@@ -59,23 +80,25 @@ export function ComboboxOptions({ opcoes = [], placeholder, icon, value, onValue
                     <ComboboxEmpty>Nenhum clube encontrado</ComboboxEmpty>
                     <ComboboxList>
                         {(itemId) => {
-                            const club = isClubList
-                                ? (opcoes as ClubItem[]).find((c) => String(c.id) === itemId)
+                            const option = isObjectList
+                                ? (opcoes as ComboboxOptionItem[]).find((item) => String(item.id) === itemId)
                                 : null;
 
                             return (
                                 <ComboboxItem key={String(itemId)} value={String(itemId)}>
-                                    {club ? (
+                                    {option ? (
                                         <div className="flex w-full items-center justify-between gap-2 py-0.5">
                                             <div className="flex items-center gap-2 truncate">
-                                                <span className="body-sm truncate">{club.name} ({club.acronym})</span>
+                                                <span className="body-sm truncate">{option.name} ({option.acronym})</span>
                                             </div>
-                                            <span className="caption-xs font-semibold text-primary shrink-0">
-                                                {club.cash.toLocaleString("pt-BR", {
-                                                    style: "currency",
-                                                    currency: "BRL",
-                                                })}
-                                            </span>
+                                            {typeof option.cash === "number" && (
+                                                <span className="caption-xs font-semibold text-primary shrink-0">
+                                                    {option.cash.toLocaleString("pt-BR", {
+                                                        style: "currency",
+                                                        currency: "BRL",
+                                                    })}
+                                                </span>
+                                            )}
                                         </div>
                                     ) : (
                                         String(itemId)
