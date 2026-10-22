@@ -10,8 +10,6 @@ import {
     HeartPulse,
     Trash2,
     Users,
-    ServerOff,
-    RefreshCw,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/useTableData";
@@ -24,7 +22,6 @@ import { DialogBuy } from "./dialogBuy";
 import { SortOption, SortTable } from "./sortTable";
 import { IconContainer } from "@/components/ui/icon-container";
 import { DialogNewPlayer } from "./dialogNewPlayer";
-import { Button } from "@/components/ui/button";
 
 const conditionClasses: Record<PlayerCondition, string> = {
     Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -154,25 +151,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                         {loading ? (
                             <tr><td colSpan={10} className="h-28 text-center text-muted-foreground">Carregando jogadores...</td></tr>
                         ) : error ? (
-                            <tr>
-                                <td colSpan={10} className="h-28 text-center text-destructive">
-                                    <div className="flex flex-col items-center justify-center gap-2">
-                                        <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
-                                            <ServerOff size={24} className="text-muted-foreground" />
-                                        </IconContainer>
-                                        <p className="heading-card text-foreground font-semibold mt-1">Não foi possível carregar os jogadores</p>
-                                        <p className="body-sm text-muted-foreground max-w-sm">Não foi possível carregar os dados. Verifique a conexão e tente de novo.</p>
-                                        <p className="body-sm text-destructive-soft">{error}</p>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => window.location.reload()}
-                                        >
-                                            <RefreshCw size={16} />
-                                            Tentar novamente
-                                        </Button>
-                                    </div>
-                                </td>
-                                </tr>
+                            <tr><td colSpan={10} className="h-28 text-center text-destructive">{error}</td></tr>
                         ) : visiblePlayers.length === 0 ? (
                             <tr>
                                 <td colSpan={10} className="py-12 text-center">

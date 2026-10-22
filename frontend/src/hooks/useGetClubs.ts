@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react";
 import { fetchApi } from "../lib/api";
 
-
-
 export interface ClubItem {
     id: number;
     name: string;
