@@ -1,13 +1,18 @@
 import { useCallback, useState } from "react";
 import { fetchApi } from "../lib/api";
 
+export type PlayerCondition = "Apto" | "Mal condicionado" | "Doente";
+
 export interface PlayerItem {
     id: number;
     name: string;
     position: string;
+    positionLabel: string;
+    initials: string;
+    avatarClass: string;
     agility: number;
     age: number;
-    condition: string;
+    condition: PlayerCondition;
     baseValue: number;
     marketValue: number;
     pace: number;
@@ -19,6 +24,8 @@ export interface PlayerItem {
     potential: number;
     overall: number;
     clubId: number | null;
+    clubCode?: string;
+    clubName?: string;
 }
 
 interface PlayersRaw {
@@ -58,11 +65,58 @@ interface PlayersPaginatedResponse {
     }
 }
 
-interface GetPlayersParams {
+export interface GetPlayersParams {
     page?: number;
     limit?: number;
     clubId?: number | null;
+    search?: string;
+    position?: string;
+    condition?: string;
+    free?: boolean;
+    minAge?: number;
+    maxAge?: number;
+    minValue?: number;
+    maxValue?: number;
+    sort?: string;
 }
+
+const positionLabels: Record<string, string> = {
+    GOL: "Goleiro",
+    ZAG: "Zagueiro",
+    LAT: "Lateral",
+    MEI: "Meio-campo",
+    ATA: "Atacante",
+};
+
+const avatarClasses = [
+    "bg-avatar-zinc text-avatar-zinc-foreground",
+    "bg-avatar-pink text-avatar-pink-foreground",
+    "bg-avatar-cyan text-avatar-cyan-foreground",
+    "bg-avatar-teal text-avatar-teal-foreground",
+    "bg-avatar-violet text-avatar-violet-foreground",
+];
+
+function normalizeCondition(condition: string): PlayerCondition {
+    switch (condition.toUpperCase()) {
+        case "MAL_CONDICIONADO":
+            return "Mal condicionado";
+        case "DOENTE":
+            return "Doente";
+        default:
+            return "Apto";
+    }
+}
+
+function getInitials(name: string) {
+    return name
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join("")
+        .toUpperCase();
+}
+
 export function useGetPlayers() {
     const [players, setPlayers] = useState<PlayerItem[]>([]);
     const [meta, setMeta] = useState<PaginationMeta | null>({
@@ -80,9 +134,25 @@ export function useGetPlayers() {
 
         try {
             const searchParams = new URLSearchParams();
-            if (params?.page) searchParams.append("page", params.page.toString());
-            if (params?.limit) searchParams.append("limit", params.limit.toString());
-            if (params?.clubId !== undefined && params?.clubId !== null) searchParams.append("club_id", params.clubId?.toString() ?? "");
+            const values: Record<string, string | number | boolean | null | undefined> = {
+                page: params?.page,
+                limit: params?.limit,
+                club_id: params?.clubId,
+                search: params?.search,
+                position: params?.position,
+                condition: params?.condition,
+                free: params?.free,
+                min_age: params?.minAge,
+                max_age: params?.maxAge,
+                min_value: params?.minValue,
+                max_value: params?.maxValue,
+                sort: params?.sort,
+            };
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== "") {
+                    searchParams.set(key, String(value));
+                }
+            });
 
             const queryString = searchParams.toString();
             const endpoint = `/players${queryString ? `?${queryString}` : ""}`;
@@ -115,9 +185,12 @@ export function useGetPlayers() {
                 id: p.id,
                 name: p.name,
                 position: p.position,
+                positionLabel: positionLabels[p.position] ?? p.position,
+                initials: getInitials(p.name),
+                avatarClass: avatarClasses[p.id % avatarClasses.length],
                 agility: p.agility,
                 age: p.age,
-                condition: p.condition,
+                condition: normalizeCondition(p.condition),
                 baseValue: p.base_value,
                 marketValue: p.market_value,
                 pace: p.pace,

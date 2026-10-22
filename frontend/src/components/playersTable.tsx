@@ -11,8 +11,10 @@ import {
     Trash2,
     Users,
 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Player, useTableData, type PlayerCondition, type TableDataOptions } from "@/src/hooks/useTableData";
+import { useEffect, useMemo, useState } from "react";
+import { useGetPlayers, type GetPlayersParams, type PlayerCondition } from "@/src/hooks/useGetPlayers";
+import { useGetClubs } from "@/src/hooks/useGetClubs";
+import type { Player, TableDataOptions } from "@/src/hooks/useTableData";
 import { Dropdown } from "./dropdown";
 import DialogDelete from "./dialogDelete";
 import { DialogCondition } from "./dialogCondition";
@@ -69,13 +71,26 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
     const [sortOption, setSortOption] = useState<PlayerSortValue>("name");
     const [page, setPage] = useState(1);
 
-    const { players, totalItems, totalPages, loading, error } = useTableData({
-        ...filters,
-        free: tab === "Todos" ? undefined : tab === "Livres",
-        sort: "name",
-        page,
-        limit: 10,
-    });
+    const { getPlayers, players, meta, loading, error } = useGetPlayers();
+    const { getClubs, clubs } = useGetClubs();
+    const totalItems = meta?.total_items ?? 0;
+    const totalPages = meta?.total_pages ?? 0;
+
+    useEffect(() => {
+        const params: GetPlayersParams = {
+            ...filters,
+            free: tab === "Todos" ? undefined : tab === "Livres",
+            sort: "name",
+            page,
+            limit: 10,
+        };
+        void getPlayers(params);
+    }, [filters, getPlayers, page, tab]);
+
+    useEffect(() => {
+        void getClubs();
+    }, [getClubs]);
+
     const [playerIsDeleted, setPlayerIsDeleted] = useState<Player | null>(null);
     const [playerConditionChanged, setPlayerConditionChanged] = useState<Player | null>(null);
     const [playerEdited, setPlayerEdited] = useState<Player | null>(null);
@@ -83,7 +98,15 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
     const [playerToBuy, setPlayerToBuy] = useState<Player | null>(null);
 
     const visiblePlayers = useMemo(() => {
-        const sorted = [...players];
+        const playersWithClubs: Player[] = players.map((player) => {
+            const club = player.clubId === null ? undefined : clubs.find((item) => item.id === player.clubId);
+            return {
+                ...player,
+                clubCode: club?.acronym,
+                clubName: club?.name,
+            };
+        });
+        const sorted = [...playersWithClubs];
         switch (sortOption) {
             case "age-desc":
                 return sorted.sort((a, b) => b.age - a.age);
@@ -99,7 +122,7 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
             default:
                 return sorted.sort((a, b) => a.name.localeCompare(b.name));
         }
-    }, [players, sortOption]);
+    }, [clubs, players, sortOption]);
 
     function changeTab(nextTab: "Todos" | "Livres" | "Em clubes") {
         setTab(nextTab);
@@ -189,10 +212,10 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
                                 <td className="px-2 text-right text-muted-foreground body-sm">{player.baseValue.toFixed(2).replace(".", ",")}</td>
                                 <td className="px-2 text-right body-sm-semibold">{player.marketValue.toFixed(2).replace(".", ",")}</td>
                                 <td className="px-2">
-                                    {player.clubName ?
+                                    {player.clubId !== null && player.clubId !== undefined ?
                                         <div className="flex items-center gap-2 whitespace-nowrap"><span className="rounded bg-muted px-1 py-0.5 caption-xs-medium">
-                                            {player.clubCode}
-                                        </span><u>{player.clubName}</u>
+                                            {player.clubCode ?? "Clube"}
+                                        </span><u>{player.clubName ?? "Clube"}</u>
                                         </div> :
                                         <div className="flex items-center gap-2 whitespace-nowrap">
                                             <span className="rounded-lg bg-muted px-2 py-1 caption-xs-medium">Livre</span>
