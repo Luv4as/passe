@@ -1,5 +1,6 @@
 'use client'
 
+import { DialogNewMatch } from "@/src/components/dialogNewMatch";
 import { StandingsTable } from "@/src/components/standingsTable";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useStandings } from "@/src/hooks/useStandings";
@@ -16,7 +17,7 @@ export default function StandingsPage() {
 
     useEffect(() => {
         setHeaderAction(
-            <div></div>
+            <DialogNewMatch />
         );
         return () => setHeaderAction(null);
     }, [setHeaderAction]);
