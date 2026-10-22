@@ -6,41 +6,29 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/src/components/sidebar";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { ChevronRight, ListOrderedIcon, Shield, Swords, Users } from "lucide-react";
-import { usePathname } from "next/dist/client/components/navigation";
+import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 
-export default function MainLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
-    const { headerAction } = useHeaderAction();
-    const segments = usePathname().split("/").filter(Boolean);
+function LayoutContent({ children }: { children: React.ReactNode }) {
+
+    const { headerAction, customTitle } = useHeaderAction();
+    const pathname = usePathname();
+    const segments = pathname.split("/").filter(Boolean);
+
+    const isClubs = segments.includes("clubs");
+    const isDynamicClub = isClubs && segments.length > segments.indexOf("clubs") + 1;
+
     const routeFormatted = segments.map((segment) => {
-        if (segment === "market") {
-            return "Mercado";
-        }
-        if (segment === "league") {
-            return "Liga";
-        }
-        if (segment === "players") {
-            return "Jogadores";
-        }
-        if (segment === "clubs") {
-            return "Clubes";
-        }
-        if (segment === "matches") {
-            return "Partidas";
-        }
-        if (segment === "standings") {
-            return "Classificação";
-        }
+        if (segment === "market") return "Mercado";
+        if (segment === "league") return "Liga";
+        if (segment === "players") return "Jogadores";
+        if (segment === "clubs") return "Clubes";
+        if (segment === "matches") return "Partidas";
+        if (segment === "standings") return "Classificação";
         return segment;
-    })
+    });
 
     const getPageDescription = () => {
-        const isClubs = segments.includes("clubs");
-        const isDynamicClub = isClubs && segments.length > segments.indexOf("clubs") + 1;
-
         if (segments.includes("players")) {
             return "Cadastre jogadores, acompanhe os indicadores e compre os que estão livres.";
         }
@@ -72,58 +60,73 @@ export default function MainLayout({
             return <ListOrderedIcon className="h-6 w-6 text-primary" />;
         }
         return <Users className="h-6 w-6 text-primary" />;
-    }
+    };
+
+    const isStatsPage = getPageDescription() === "Stats do clube";
+    const currentTitle = customTitle ?? routeFormatted[routeFormatted.length - 1];
 
     return (
-        <SidebarProvider defaultOpen={true}>
-            <AppSidebar />
-            <SidebarInset>
-                <header className="flex h-14 items-center gap-2 border-b border-border px-4 shrink-0">
-                    <SidebarTrigger />
-                    <div className="h-4 w-px bg-border mx-2" />
-                    <div className="flex flex-row items-center gap-2">
-                        <span className="body-sm text-muted-foreground">
-                            {routeFormatted[routeFormatted.length - 2]}
-                        </span>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        <span className="body-sm-medium text-foreground">
-                            {routeFormatted[routeFormatted.length - 1]}
-                        </span>
-                    </div>
+        <SidebarInset>
+            <header className="flex h-14 items-center gap-2 border-b border-border px-4 shrink-0">
+                <SidebarTrigger />
+                <div className="h-4 w-px bg-border mx-2" />
+                <div className="flex flex-row items-center gap-2">
+                    <span className="body-sm text-muted-foreground">
+                        {routeFormatted[routeFormatted.length - 2] ?? "Liga"}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    <span className="body-sm-medium text-foreground">
+                        {routeFormatted[routeFormatted.length - 1] ?? ""}
+                    </span>
+                </div>
+            </header>
 
-                </header>
-
-                <main className="flex-1 py-7 px-8">
-                    <div className="flex flex-row items-baseline justify-between mb-6 gap-2">
-                        <div className="flex flex-row items-center gap-4">
-                            <div>
-                                <IconContainer className=" bg-primary-soft border border-primary h-12 w-12 ">
-                                    {getPageIcon()}
-                                </IconContainer>
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <h1 className="text-2xl heading">{routeFormatted[routeFormatted.length - 1]}</h1>
-                                <div className="body-sm text-muted-foreground">
-                                    {getPageDescription() !== "Stats do clube" ? (
-                                        getPageDescription()
-                                    ) : (
-                                        <div className="flex flex-row items-center gap-2">
-                                            <Badge variant={"outline"} className="border-border bg-background text-foreground" >
-                                                Sigla { }
-                                            </Badge>
-                                            <Badge variant={"outline"} className="border-border bg-background text-foreground">
-                                                { } de { } jogadores
-                                            </Badge>
-                                        </div>
-                                    )}
-                                </div>
+            <main className="flex-1 py-7 px-8">
+                <div className="flex flex-row items-baseline justify-between mb-6 gap-2">
+                    <div className="flex flex-row items-center gap-4">
+                        <div>
+                            <IconContainer className="bg-primary-soft border border-primary h-12 w-12">
+                                {getPageIcon()}
+                            </IconContainer>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <h1 className="text-2xl heading">
+                                {currentTitle}
+                            </h1>
+                            <div className="body-sm text-muted-foreground">
+                                {isStatsPage ? headerAction : getPageDescription()}
                             </div>
                         </div>
-                        {headerAction}
                     </div>
-                    {children}
-                </main>
-            </SidebarInset>
+                    {!isStatsPage && headerAction}
+                </div>
+                {children}
+            </main>
+        </SidebarInset>
+    );
+}
+
+export default function MainLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    return (
+        <SidebarProvider defaultOpen={true}>
+            <Suspense fallback={
+                <div className="flex h-screen w-full">
+                    <div className="w-64 border-r border-border bg-sidebar" />
+                    <SidebarInset>
+                        <header className="flex h-14 items-center border-b border-border px-4 shrink-0">
+                            <SidebarTrigger />
+                        </header>
+                        <main className="flex-1 py-7 px-8">{children}</main>
+                    </SidebarInset>
+                </div>
+            }>
+                <AppSidebar />
+                <LayoutContent>{children}</LayoutContent>
+            </Suspense>
         </SidebarProvider>
     );
 }
