@@ -17,12 +17,11 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 COPY prisma ./prisma/
+COPY prisma7.config.ts ./
 RUN npm ci --omit=dev
 RUN npx prisma generate
 COPY --from=build /app/dist ./dist
-COPY docker-entrypoint.sh ./docker-entrypoint.sh
-RUN chmod +x ./docker-entrypoint.sh
 
 EXPOSE 3000
 
-CMD ["./docker-entrypoint.sh"]
+CMD ["sh", "-c", "npx prisma migrate deploy && exec npm run start:prod"]
