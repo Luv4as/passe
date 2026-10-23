@@ -3,22 +3,25 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardInfos } from "@/components/ui/card-infos";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ClubPlayersTable } from "@/src/components/clubPlayersTable";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useGetClub } from "@/src/hooks/useGetClub";
-import { Coins, Landmark, Shirt, ShoppingCart, Wallet } from "lucide-react";
+import { Coins, Landmark, Shirt, ShoppingCart, Wallet, History, ClipboardList } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useEffect } from "react";
-
+import { Suspense, use, useEffect, useState } from "react";
 
 interface ClubPageProps {
     params: Promise<{ id: string }>;
 }
 
+type ClubTab = "elenco" | "escalacao" | "historico";
+
 function ClubContent({ params }: ClubPageProps) {
     const router = useRouter();
     const { id } = use(params);
     const clubId = Number(id);
+    const [activeTab, setActiveTab] = useState<ClubTab>("elenco");
 
     const { getClub, club, loading, error } = useGetClub(clubId);
     const { setHeaderAction, setHeaderDescription, setCustomTitle } = useHeaderAction();
@@ -37,7 +40,7 @@ function ClubContent({ params }: ClubPageProps) {
                         Sigla {club.acronym}
                     </Badge>
                     <Badge variant="outline" className="border-border bg-background text-foreground">
-                        {club.players.length} de 5 jogadores
+                        {club.players.length} de 12 jogadores
                     </Badge>
                 </div>
             );
@@ -45,10 +48,9 @@ function ClubContent({ params }: ClubPageProps) {
                 <div className="flex flex-row items-center gap-2">
                     <Button
                         type="button"
-                        onClick={() =>
-                            router.push(`/market/players`)
-                        }>
-                        <ShoppingCart size={16} />
+                        onClick={() => router.push(`/market/players`)}
+                    >
+                        <ShoppingCart size={16} className="mr-1.5" />
                         Comprar Jogadores
                     </Button>
                 </div>
@@ -70,7 +72,7 @@ function ClubContent({ params }: ClubPageProps) {
     }
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
             <div className="flex flex-row items-stretch justify-center gap-4">
                 <CardInfos
                     title="Caixa"
@@ -85,7 +87,7 @@ function ClubContent({ params }: ClubPageProps) {
                     unit="moedas"
                     description="Soma dos valores de mercado" />
                 <CardInfos
-                    title="Patrimonio"
+                    title="Patrimônio"
                     icon={<Landmark size={16} />}
                     bigNumber={club.netWorth}
                     unit="moedas"
@@ -94,13 +96,61 @@ function ClubContent({ params }: ClubPageProps) {
                     title="Elenco"
                     icon={<Shirt size={16} />}
                     bigNumber={club.players.length}
-                    unit="jogadores"
+                    unit="de 12"
                     description="Limite de 12 jogadores" />
             </div>
-            <ClubPlayersTable />
-            <p className="caption-xs text-muted-foreground">Valor de mercado, dias restantes e % de multa calculados para uma venda agora (12/11/2026, 15:00). A multa tem teto de 10,00.</p>
+            <Tabs
+                defaultValue="elenco"
+                value={activeTab}
+                onValueChange={(val) => setActiveTab(val as ClubTab)}
+                className="w-full">
+                <TabsList className="flex w-full justify-start items-center border-b border-border bg-transparent p-0 h-auto gap-6 rounded-none">
+                    <TabsTrigger
+                        value="elenco"
+                        className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-3 pt-2 font-medium flex items-center gap-2">
+                        <Shirt size={16} />
+                        Elenco
+                        <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground font-semibold">
+                            {club.players.length}
+                        </span>
+                    </TabsTrigger>
+
+                    <TabsTrigger
+                        value="escalacao"
+                        className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-3 pt-2 font-medium flex items-center gap-2">
+                        <ClipboardList size={16} />
+                        Escalação
+                    </TabsTrigger>
+
+                    <TabsTrigger
+                        value="historico"
+                        className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-3 pt-2 font-medium flex items-center gap-2">
+                        <History size={16} />
+                        Histórico
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="elenco" className="mt-4 flex flex-col gap-2">
+                    <ClubPlayersTable />
+                    <p className="caption-xs text-muted-foreground">
+                        Valor de mercado, dias restantes e % de multa calculados para uma venda agora. A multa tem teto de 10,00.
+                    </p>
+                </TabsContent>
+
+                <TabsContent value="escalacao" className="mt-4">
+                    <div className="p-8 border border-border rounded-xl bg-card text-center text-muted-foreground">
+                        Selecione os 5 titulares e a formação tática do {club.name}.
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="historico" className="mt-4">
+                    <div className="p-8 border border-border rounded-xl bg-card text-center text-muted-foreground">
+                        Histórico de compras e vendas do {club.name}.
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
-    )
+    );
 }
 
 export default function ClubEspecificPage(props: ClubPageProps) {
