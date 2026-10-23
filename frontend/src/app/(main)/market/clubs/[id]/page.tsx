@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CardInfos } from "@/components/ui/card-infos";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ClubPlayersTable } from "@/src/components/clubPlayersTable";
+import { ClubTransactionsTable } from "@/src/components/clubTransactionsTable";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useGetClub } from "@/src/hooks/useGetClub";
 import {
@@ -173,9 +174,7 @@ function ClubContent({ params }: ClubPageProps) {
         </TabsContent>
 
         <TabsContent value="historico" className="mt-4">
-          <div className="p-8 border border-border rounded-xl bg-card text-center text-muted-foreground">
-            Histórico de compras e vendas do {club.name}.
-          </div>
+          <ClubTransactionsTable clubId={clubId}/>
         </TabsContent>
       </Tabs>
     </div>

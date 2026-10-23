@@ -10,6 +10,7 @@ import {
   HeartPulse,
   Trash2,
   Users,
+  Info,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -208,17 +209,24 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
           <tbody>
             {loading ? (
               <tr>
-                <td
-                  colSpan={10}
-                  className="h-28 text-center text-muted-foreground"
-                >
-                  Carregando jogadores...
+                <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                  <div className="flex flex-row items-center gap-3 px-3 py-2.5 w-full divide-border overflow-hidden rounded-xl border border-border">
+                    <Info size={16} className="text-foreground" />
+                    <p className="body-sm text-foreground">
+                      Carregando jogadores...
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : error ? (
               <tr>
                 <td colSpan={10} className="h-28 text-center text-destructive">
-                  {error}
+                  <div className="flex flex-row items-center gap-3 px-3 py-2.5 w-full rounded-xl border border-border bg-destructive-soft">
+                    <Info size={16} className="text-destructive-soft-foreground shrink-0" />
+                    <p className="body-sm text-destructive-soft-foreground">
+                      {error}
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : visiblePlayers.length === 0 ? (

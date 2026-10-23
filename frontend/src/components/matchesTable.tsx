@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ChevronRight,
+  Info,
   RefreshCw,
   ServerOff,
   Shield,
@@ -110,11 +111,13 @@ export function MatchesTable() {
           <tbody className="divide-y divide-border">
             {loadingMatches || loadingClubs ? (
               <tr>
-                <td
-                  colSpan={6}
-                  className="py-8 text-center text-muted-foreground"
-                >
-                  Carregando histórico de partidas...
+                <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                  <div className="flex flex-row items-center gap-3 px-3 py-2.5 w-full divide-border overflow-hidden rounded-xl border border-border">
+                    <Info size={16} className="text-foreground" />
+                    <p className="body-sm text-foreground">
+                      Carregando histórico de partidas...
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : errorMatches || errorClubs ? (
