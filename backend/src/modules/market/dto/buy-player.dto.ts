@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsInt, IsNotEmpty, IsNumber, IsString, Matches, Min } from "class-validator";
+import { IsInt, IsNotEmpty, IsString, Matches, Min } from "class-validator";
 
 export class BuyPlayerDto {
     @IsNotEmpty({ message: 'club_id não pode ser vazio' })

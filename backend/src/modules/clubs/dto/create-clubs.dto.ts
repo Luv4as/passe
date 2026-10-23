@@ -5,7 +5,7 @@ export class CreateClubsDto {
     @IsNotEmpty({ message: 'name não pode ser vazio' })
     @MinLength(3, { message: 'name deve ter no mínimo 3 caracteres' })
     @MaxLength(60, { message: 'name deve ter no máximo 60 caracteres' })
-    @Matches(/^[a-zA-ZÀ-ÿ\s.\-]+$/, {
+    @Matches(/^[a-zA-ZÀ-ÿ\s.-]+$/, {
         message: 'name deve conter apenas letras, espaços, hífen e ponto',
     })
     name: string;

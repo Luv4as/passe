@@ -125,6 +125,7 @@ O arquivo `.env.example` na raiz do repositório e em `backend/` documenta todas
 POSTGRES_USER=passe
 POSTGRES_PASSWORD=change-me
 POSTGRES_DB=passe
+NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 ```
 
 ### `backend/.env.example` — usado pelo backend em desenvolvimento local
@@ -143,6 +144,11 @@ FRONTEND_URL="http://localhost:5173"
 | `FRONTEND_URL` | URL de origem do frontend (usada no CORS do NestJS) |
 
 > O frontend lê `NEXT_PUBLIC_API_URL` (opcional). Se não definida, usa `http://localhost:3000/api/v1` por padrão.
+>
+> No Docker Compose, essa variável é incorporada durante o build do frontend. Para executar
+> em outro domínio ou IP, defina `NEXT_PUBLIC_API_URL` no `.env` da raiz antes de executar
+> `docker compose up --build`. O container do backend aplica automaticamente as migrations
+> versionadas com `prisma migrate deploy` antes de iniciar a API.
 
 
 ## 5. Estrutura de Pastas
@@ -184,7 +190,7 @@ passe/
 | Biblioteca | Motivo |
 | :--- | :--- |
 | **NestJS** (`@nestjs/core`, `@nestjs/common`, etc.) | Framework Node.js com estrutura modular, injeção de dependência e decorators — facilita organização de controllers, services e pipes |
-| **Prisma** (`prisma`, `@prisma/client`) | ORM type-safe com migrations versionadas e geração de tipos TypeScript a partir do schema |
+| **Prisma 7** (`prisma`, `@prisma/client`) | ORM type-safe com migrations versionadas e geração de tipos TypeScript a partir do schema |
 | **`@prisma/adapter-pg`** | Adapter oficial do Prisma para usar o driver `pg` diretamente, com suporte a connection pooling |
 | **`@nestjs/swagger`** | Geração automática de documentação OpenAPI (Swagger UI) a partir dos decorators |
 | **`class-validator` / `class-transformer`** | Validação e transformação automática dos DTOs via `ValidationPipe` |

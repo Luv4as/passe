@@ -1,8 +1,8 @@
-import { ArgumentMetadata, Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
+import { Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
 
 @Injectable()
 export class ParseIdPipe implements PipeTransform<string, number> {
-  transform(value: string, metadata: ArgumentMetadata): number {
+  transform(value: string): number {
     const isStrictPositiveInteger = /^[1-9]\d*$/.test(value);
 
     if (!isStrictPositiveInteger) {

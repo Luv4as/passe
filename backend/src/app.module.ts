@@ -6,6 +6,7 @@ import { ClubsModule } from './modules/clubs/clubs.module';
 import { MarketModule } from './modules/market/maket.module';
 import { LeagueModule } from './modules/league/league.module';
 import { HTTPLoggerMiddleware } from './common/middleware/logger.middleware';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { HTTPLoggerMiddleware } from './common/middleware/logger.middleware';
     MarketModule,
     LeagueModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

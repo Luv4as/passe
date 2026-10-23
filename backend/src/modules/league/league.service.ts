@@ -292,10 +292,6 @@ export class LeagueService {
         processarDuelo(5, dto.away_club_id, awayClubData.linha[2], homeClubData.linha[0]);
         processarDuelo(6, dto.away_club_id, awayClubData.linha[1], homeClubData.linha[1]);
 
-        let resultado: 'MANDANTE' | 'VISITANTE' | 'EMPATE' = 'EMPATE';
-        if (golsMandante > golsVisitante) resultado = 'MANDANTE';
-        else if (golsVisitante > golsMandante) resultado = 'VISITANTE';
-
         const agora = new Date();
         const partidaSalva = await this.prisma.$transaction(async (tx) => {
             const partida = await tx.partidas.create({

@@ -1,4 +1,3 @@
-// src/modules/players/dto/create-player.dto.ts
 import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsNotEmpty, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 
@@ -7,8 +6,14 @@ export class CreatePlayerDto {
     @IsNotEmpty()
     @Transform(({ value }) => {
         if (typeof value !== 'string') return value;
-        return value
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+        const withoutControlCharacters = Array.from(value)
+            .filter((character) => {
+                const code = character.charCodeAt(0);
+                return !(code <= 0x1f || (code >= 0x7f && code <= 0x9f));
+            })
+            .join('');
+
+        return withoutControlCharacters
             .trim()
             .replace(/\s+/g, ' ');
     })

@@ -119,7 +119,7 @@ export function DialogNewPlayer({
   const [drawerPlayer, setDrawerPlayer] = useState<Player | null>(null);
   const [touched, setTouched] = useState(false);
 
-  const { form, saving, error, updateField, createPlayer } = useCreatePlayer({
+  const { form, saving, updateField, createPlayer } = useCreatePlayer({
     onSuccess: (player) => {
       setOpen(false);
       setCreatedPlayer(player);

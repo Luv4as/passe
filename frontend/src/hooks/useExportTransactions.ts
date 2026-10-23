@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { TransactionType } from "./useGetTransactions";
+import { API_BASE_URL } from "../lib/api";
 
 export interface ExportTransactionsFilters {
     type?: TransactionType[];
@@ -26,8 +27,7 @@ export function useExportTransactions() {
             }
 
             const queryString = params.toString();
-            const baseUrl = process.env.NEXT_PUBLIC_API_URL || "/api/v1";
-            const endpoint = `${baseUrl}/clubs/${clubId}/transactions/export${queryString ? `?${queryString}` : ""}`;
+            const endpoint = `${API_BASE_URL}/clubs/${clubId}/transactions/export${queryString ? `?${queryString}` : ""}`;
 
             const response = await fetch(endpoint, {
                 method: "GET",
