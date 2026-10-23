@@ -80,81 +80,81 @@
 :root {
   /* BASE COLORS (Brutas) */
   --background-colorW: #ffffff;
-  --background-colorB: #09090B;
-  --foreground-colorW: #09090B;
-  --foreground-colorB: #FAFAFA;
-  --card-colorW: #FFFFFF;
-  --card-colorB: #18181B;
-  --card-foreground-colorW: #09090B;
-  --card-foreground-colorB: #FAFAFA;
-  --popover-colorW: #FFFFFF;
-  --popover-colorB: #18181B;
-  --popover-foreground-colorW: #09090B;
-  --popover-foreground-colorB: #FAFAFA;
-  --muted-colorW: #F4F4F5;
-  --muted-colorB: #27272A;
+  --background-colorB: #09090b;
+  --foreground-colorW: #09090b;
+  --foreground-colorB: #fafafa;
+  --card-colorW: #ffffff;
+  --card-colorB: #18181b;
+  --card-foreground-colorW: #09090b;
+  --card-foreground-colorB: #fafafa;
+  --popover-colorW: #ffffff;
+  --popover-colorB: #18181b;
+  --popover-foreground-colorW: #09090b;
+  --popover-foreground-colorB: #fafafa;
+  --muted-colorW: #f4f4f5;
+  --muted-colorB: #27272a;
   --muted-foreground-colorW: #686872;
-  --muted-foreground-colorB: #9F9FA9;
-  --accent-colorW: #F4F4F5;
-  --accent-colorB: #27272A;
-  --accent-foreground-colorW: #18181B;
-  --accent-foreground-colorB: #FAFAFA;
-  --border-colorW: #E4E4E7;
-  --border-colorB: #27272A;
-  --input-colorW: #91919B;
-  --input-colorB: #71717B;
-  --ring-colorW: #155DFC;
-  --ring-colorB: #3280FF;
+  --muted-foreground-colorB: #9f9fa9;
+  --accent-colorW: #f4f4f5;
+  --accent-colorB: #27272a;
+  --accent-foreground-colorW: #18181b;
+  --accent-foreground-colorB: #fafafa;
+  --border-colorW: #e4e4e7;
+  --border-colorB: #27272a;
+  --input-colorW: #91919b;
+  --input-colorB: #71717b;
+  --ring-colorW: #155dfc;
+  --ring-colorB: #3280ff;
 
   /* STATUS COLORS */
-  --success-colorW: #00813A;
-  --success-colorB: #05DF72;
-  --success-soft-colorW: #F0FDF4;
-  --success-soft-colorB: #032E15;
+  --success-colorW: #00813a;
+  --success-colorB: #05df72;
+  --success-soft-colorW: #f0fdf4;
+  --success-soft-colorB: #032e15;
   --success-soft-foreground-colorW: #016630;
-  --success-soft-foreground-colorB: #7BF1A8;
-  --success-soft-border-colorW: #B9F8CF;
-  --success-soft-border-colorB: #0D542B;
-  --warning-colorW: #B55200;
-  --warning-colorB: #FABC00;
-  --warning-soft-colorW: #FFFBEB;
+  --success-soft-foreground-colorB: #7bf1a8;
+  --success-soft-border-colorW: #b9f8cf;
+  --success-soft-border-colorB: #0d542b;
+  --warning-colorW: #b55200;
+  --warning-colorB: #fabc00;
+  --warning-soft-colorW: #fffbeb;
   --warning-soft-colorB: #461901;
-  --warning-soft-foreground-colorW: #953D00;
-  --warning-soft-foreground-colorB: #FFD237;
-  --warning-soft-border-colorW: #FEE685;
-  --warning-soft-border-colorB: #7B3306;
-  --destructive-colorW: #E40016;
-  --destructive-foreground-color: #FFFFFF;
-  --destructive-soft-colorW: #FEF2F2;
+  --warning-soft-foreground-colorW: #953d00;
+  --warning-soft-foreground-colorB: #ffd237;
+  --warning-soft-border-colorW: #fee685;
+  --warning-soft-border-colorB: #7b3306;
+  --destructive-colorW: #e40016;
+  --destructive-foreground-color: #ffffff;
+  --destructive-soft-colorW: #fef2f2;
   --destructive-soft-colorB: #460809;
-  --destructive-soft-foreground-colorW: #BF000F;
-  --destructive-soft-foreground-colorB: #FFA3A4;
-  --destructive-soft-border-colorW: #FFCACA;
-  --destructive-soft-border-colorB: #82181A;
+  --destructive-soft-foreground-colorW: #bf000f;
+  --destructive-soft-foreground-colorB: #ffa3a4;
+  --destructive-soft-border-colorW: #ffcaca;
+  --destructive-soft-border-colorB: #82181a;
 
   /* Avatares */
-  --avatar-violet: #EDE9FE;
-  --avatar-violet-foreground: #7008E7;
-  --avatar-pink: #FCE7F3;
-  --avatar-pink-foreground: #C2005C;
-  --avatar-cyan: #CEFAFE;
-  --avatar-cyan-foreground: #005F78;
-  --avatar-teal: #CBFBF1;
-  --avatar-teal-foreground: #005F5A;
-  --avatar-zinc: #E4E4E7;
-  --avatar-zinc-foreground: #3F3F46;
+  --avatar-violet: #ede9fe;
+  --avatar-violet-foreground: #7008e7;
+  --avatar-pink: #fce7f3;
+  --avatar-pink-foreground: #c2005c;
+  --avatar-cyan: #cefafe;
+  --avatar-cyan-foreground: #005f78;
+  --avatar-teal: #cbfbf1;
+  --avatar-teal-foreground: #005f5a;
+  --avatar-zinc: #e4e4e7;
+  --avatar-zinc-foreground: #3f3f46;
 
   /* SIDEBAR COLORS */
-  --sidebar-colorW: #FAFAFA;
-  --sidebar-colorB: #18181B;
-  --sidebar-foreground-colorW: #18181B;
-  --sidebar-foreground-colorB: #FAFAFA;
-  --sidebar-border-colorW: #E4E4E7;
-  --sidebar-border-colorB: #27272A;
+  --sidebar-colorW: #fafafa;
+  --sidebar-colorB: #18181b;
+  --sidebar-foreground-colorW: #18181b;
+  --sidebar-foreground-colorB: #fafafa;
+  --sidebar-border-colorW: #e4e4e7;
+  --sidebar-border-colorB: #27272a;
 
   /* ACTIONS (Ações Dinâmicas) */
   --primary-color: #155dfc;
-  --primary-foreground-color: #FFFFFF;
+  --primary-foreground-color: #ffffff;
 
   --background: var(--background-colorW);
   --foreground: var(--foreground-colorW);
@@ -171,11 +171,11 @@
   --ring: var(--ring-colorW);
 
   --primary: var(--primary-color);
-  --primary-hover: #1447E6;
+  --primary-hover: #1447e6;
   --primary-foreground: var(--primary-foreground-color);
-  --primary-soft-foreground: #91C5FF;
-  --soft-foreground: #91C5FF;
-  --primary-soft: #EFF6FF;
+  --primary-soft-foreground: #91c5ff;
+  --soft-foreground: #91c5ff;
+  --primary-soft: #eff6ff;
   --secondary: var(--accent-colorW);
   --secondary-foreground: var(--accent-foreground-colorW);
   --destructive: var(--destructive-colorW);
@@ -220,10 +220,10 @@
     --border: var(--border-colorB);
     --input: var(--input-colorB);
     --ring: var(--ring-colorB);
-    --primary-hover: #3280FF;
-    --primary-soft-foreground: #91C5FF;
-    --primary-soft: #EFF6FF;
-    --soft-foreground: #91C5FF;
+    --primary-hover: #3280ff;
+    --primary-soft-foreground: #91c5ff;
+    --primary-soft: #eff6ff;
+    --soft-foreground: #91c5ff;
     --secondary: var(--accent-colorB);
     --secondary-foreground: var(--accent-foreground-colorB);
     --destructive: var(--destructive-colorW);
@@ -263,10 +263,10 @@
   --input: var(--input-colorB);
   --ring: var(--ring-colorB);
 
-  --primary-hover: #3280FF;
-  --primary-soft-foreground: #91C5FF;
-  --primary-soft: #EFF6FF;
-  --soft-foreground: #91C5FF;
+  --primary-hover: #3280ff;
+  --primary-soft-foreground: #91c5ff;
+  --primary-soft: #eff6ff;
+  --soft-foreground: #91c5ff;
   --secondary: var(--accent-colorB);
   --secondary-foreground: var(--accent-foreground-colorB);
   --destructive: var(--destructive-colorW);
@@ -335,7 +335,6 @@
   .caption-xs-medium {
     @apply text-xs font-medium leading-normal text-foreground;
   }
-
 }
 
 @layer base {

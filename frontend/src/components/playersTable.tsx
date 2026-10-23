@@ -1,18 +1,22 @@
 "use client";
 
 import {
-    ChevronLeft,
-    ChevronRight,
-    MoreHorizontal,
-    ShoppingCart,
-    Eye,
-    Pencil,
-    HeartPulse,
-    Trash2,
-    Users,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+  ShoppingCart,
+  Eye,
+  Pencil,
+  HeartPulse,
+  Trash2,
+  Users,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useGetPlayers, type GetPlayersParams, type PlayerCondition } from "@/src/hooks/useGetPlayers";
+import {
+  useGetPlayers,
+  type GetPlayersParams,
+  type PlayerCondition,
+} from "@/src/hooks/useGetPlayers";
 import { useGetClubs } from "@/src/hooks/useGetClubs";
 import type { Player, TableDataOptions } from "@/src/hooks/useTableData";
 import { Dropdown } from "./dropdown";
@@ -26,305 +30,418 @@ import { IconContainer } from "@/components/ui/icon-container";
 import { DialogNewPlayer } from "./dialogNewPlayer";
 
 const conditionClasses: Record<PlayerCondition, string> = {
-    Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
-    "Mal condicionado": "border-warning-soft-border bg-warning-soft text-warning-soft-foreground",
-    Doente: "border-destructive-soft-border bg-destructive-soft text-destructive-soft-foreground",
+  Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
+  "Mal condicionado":
+    "border-warning-soft-border bg-warning-soft text-warning-soft-foreground",
+  Doente:
+    "border-destructive-soft-border bg-destructive-soft text-destructive-soft-foreground",
 };
 
 function ConditionBadge({ condition }: { condition: PlayerCondition }) {
-    return (
-        <span className={`inline-flex h-5 items-center gap-1 rounded-lg border px-2 caption-xs-medium font-medium whitespace-nowrap ${conditionClasses[condition]}`}>
-            <span className="size-1.5 rounded-full bg-current" />
-            {condition}
-        </span>
-    );
+  return (
+    <span
+      className={`inline-flex h-5 items-center gap-1 rounded-lg border px-2 caption-xs-medium font-medium whitespace-nowrap ${conditionClasses[condition]}`}
+    >
+      <span className="size-1.5 rounded-full bg-current" />
+      {condition}
+    </span>
+  );
 }
 
-function PaginationItem({ active, children }: { active?: boolean; children: React.ReactNode }) {
-    return (
-        <button
-            type="button"
-            className={`flex size-9 items-center justify-center rounded-lg body-sm ${active ? "border border-border bg-background" : "text-foreground"}`}
-        >
-            {children}
-        </button>
-    );
+function PaginationItem({
+  active,
+  children,
+}: {
+  active?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      className={`flex size-9 items-center justify-center rounded-lg body-sm ${active ? "border border-border bg-background" : "text-foreground"}`}
+    >
+      {children}
+    </button>
+  );
 }
 
-type PlayerSortValue = "name" | "marketValue-desc" | "marketValue-asc" | "age-asc" | "age-desc" | "position";
+type PlayerSortValue =
+  | "name"
+  | "marketValue-desc"
+  | "marketValue-asc"
+  | "age-asc"
+  | "age-desc"
+  | "position";
 
 const PLAYER_SORT_OPTIONS: SortOption<PlayerSortValue>[] = [
-    { label: "nome", value: "name" },
-    { label: "idade (maior para o menor)", value: "age-desc" },
-    { label: "idade (menor para o maior)", value: "age-asc" },
-    { label: "valor de mercado (maior para o menor)", value: "marketValue-desc" },
-    { label: "valor de mercado (menor para o maior)", value: "marketValue-asc" },
-    { label: "posição", value: "position" },
+  { label: "nome", value: "name" },
+  { label: "idade (maior para o menor)", value: "age-desc" },
+  { label: "idade (menor para o maior)", value: "age-asc" },
+  { label: "valor de mercado (maior para o menor)", value: "marketValue-desc" },
+  { label: "valor de mercado (menor para o maior)", value: "marketValue-asc" },
+  { label: "posição", value: "position" },
 ];
 
 interface PlayersTableProps {
-    filters?: Pick<TableDataOptions, "search" | "position" | "condition" | "clubId" | "minAge" | "maxAge" | "minValue" | "maxValue">;
+  filters?: Pick<
+    TableDataOptions,
+    | "search"
+    | "position"
+    | "condition"
+    | "clubId"
+    | "minAge"
+    | "maxAge"
+    | "minValue"
+    | "maxValue"
+  >;
 }
 
 export default function PlayersTable({ filters = {} }: PlayersTableProps) {
-    const [tab, setTab] = useState<"Todos" | "Livres" | "Em clubes">("Todos");
-    const [sortOption, setSortOption] = useState<PlayerSortValue>("name");
-    const [page, setPage] = useState(1);
+  const [tab, setTab] = useState<"Todos" | "Livres" | "Em clubes">("Todos");
+  const [sortOption, setSortOption] = useState<PlayerSortValue>("name");
+  const [page, setPage] = useState(1);
 
-    const { getPlayers, players, meta, loading, error } = useGetPlayers();
-    const { getClubs, clubs } = useGetClubs();
-    const totalItems = meta?.total_items ?? 0;
-    const totalPages = meta?.total_pages ?? 0;
+  const { getPlayers, players, meta, loading, error } = useGetPlayers();
+  const { getClubs, clubs } = useGetClubs();
+  const totalItems = meta?.total_items ?? 0;
+  const totalPages = meta?.total_pages ?? 0;
 
-    useEffect(() => {
-        const params: GetPlayersParams = {
-            ...filters,
-            free: tab === "Todos" ? undefined : tab === "Livres",
-            sort: "name",
-            page,
-            limit: 10,
-        };
-        void getPlayers(params);
-    }, [filters, getPlayers, page, tab]);
+  useEffect(() => {
+    const params: GetPlayersParams = {
+      ...filters,
+      free: tab === "Todos" ? undefined : tab === "Livres",
+      sort: "name",
+      page,
+      limit: 10,
+    };
+    void getPlayers(params);
+  }, [filters, getPlayers, page, tab]);
 
-    useEffect(() => {
-        void getClubs();
-    }, [getClubs]);
+  useEffect(() => {
+    void getClubs();
+  }, [getClubs]);
 
-    const [playerIsDeleted, setPlayerIsDeleted] = useState<Player | null>(null);
-    const [playerConditionChanged, setPlayerConditionChanged] = useState<Player | null>(null);
-    const [playerEdited, setPlayerEdited] = useState<Player | null>(null);
-    const [playerDetails, setPlayerDetails] = useState<Player | null>(null);
-    const [playerToBuy, setPlayerToBuy] = useState<Player | null>(null);
+  const [playerIsDeleted, setPlayerIsDeleted] = useState<Player | null>(null);
+  const [playerConditionChanged, setPlayerConditionChanged] =
+    useState<Player | null>(null);
+  const [playerEdited, setPlayerEdited] = useState<Player | null>(null);
+  const [playerDetails, setPlayerDetails] = useState<Player | null>(null);
+  const [playerToBuy, setPlayerToBuy] = useState<Player | null>(null);
 
-    const visiblePlayers = useMemo(() => {
-        const playersWithClubs: Player[] = players.map((player) => {
-            const club = player.clubId === null ? undefined : clubs.find((item) => item.id === player.clubId);
-            return {
-                ...player,
-                clubCode: club?.acronym,
-                clubName: club?.name,
-            };
-        });
-        const sorted = [...playersWithClubs];
-        switch (sortOption) {
-            case "age-desc":
-                return sorted.sort((a, b) => b.age - a.age);
-            case "age-asc":
-                return sorted.sort((a, b) => a.age - b.age);
-            case "marketValue-desc":
-                return sorted.sort((a, b) => b.marketValue - a.marketValue);
-            case "marketValue-asc":
-                return sorted.sort((a, b) => a.marketValue - b.marketValue);
-            case "position":
-                return sorted.sort((a, b) => a.position.localeCompare(b.position));
-            case "name":
-            default:
-                return sorted.sort((a, b) => a.name.localeCompare(b.name));
-        }
-    }, [clubs, players, sortOption]);
-
-    function changeTab(nextTab: "Todos" | "Livres" | "Em clubes") {
-        setTab(nextTab);
-        setPage(1);
+  const visiblePlayers = useMemo(() => {
+    const playersWithClubs: Player[] = players.map((player) => {
+      const club =
+        player.clubId === null
+          ? undefined
+          : clubs.find((item) => item.id === player.clubId);
+      return {
+        ...player,
+        clubCode: club?.acronym,
+        clubName: club?.name,
+      };
+    });
+    const sorted = [...playersWithClubs];
+    switch (sortOption) {
+      case "age-desc":
+        return sorted.sort((a, b) => b.age - a.age);
+      case "age-asc":
+        return sorted.sort((a, b) => a.age - b.age);
+      case "marketValue-desc":
+        return sorted.sort((a, b) => b.marketValue - a.marketValue);
+      case "marketValue-asc":
+        return sorted.sort((a, b) => a.marketValue - b.marketValue);
+      case "position":
+        return sorted.sort((a, b) => a.position.localeCompare(b.position));
+      case "name":
+      default:
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
     }
+  }, [clubs, players, sortOption]);
 
-    return (
-        <section className="w-full overflow-hidden rounded-xl border border-border bg-card">
-            <header className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
-                <div className="flex items-center rounded-[10px] bg-muted p-0.75 text-sm">
-                    {(["Todos", "Livres", "Em clubes"] as const).map((item) => {
-                        const count = item === tab ? totalItems : "—";
-                        return (
-                            <button
-                                key={item}
-                                type="button"
-                                onClick={() => changeTab(item)}
-                                className={`flex h-7.5 items-center justify-center gap-1.5 rounded-lg px-2.5 ${tab === item ? "bg-background font-medium text-foreground" : "text-muted-foreground"}`}
-                            >
-                                {item}<span className="body-sm">{count}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-                <SortTable
-                options={PLAYER_SORT_OPTIONS}
-                value={sortOption}
-                onChange={setSortOption}
-                />
-            </header>
+  function changeTab(nextTab: "Todos" | "Livres" | "Em clubes") {
+    setTab(nextTab);
+    setPage(1);
+  }
 
-            <div className="overflow-x-auto">
-                <table className="w-full min-w-280 border-collapse body-sm-medium">
-                    <thead className="bg-muted text-muted-foreground">
-                        <tr className="h-10 border-b border-border text-left body-sm-medium">
-                            <th className="w-auto px-4">Jogador</th>
-                            <th className="w-15 px-2">Posição</th>
-                            <th className="w-16 px-2 text-right">Overall</th>
-                            <th className="w-21 px-2 text-right">Agilidade</th>
-                            <th className="w-13 px-2 text-right">Idade</th>
-                            <th className="w-33 px-2">Condição</th>
-                            <th className="w-22 px-2 text-right">Valor base</th>
-                            <th className="w-33 px-2 text-right">Valor de mercado</th>
-                            <th className="w-26 px-2">Clube</th>
-                            <th className="w-35 px-2" />
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr><td colSpan={10} className="h-28 text-center text-muted-foreground">Carregando jogadores...</td></tr>
-                        ) : error ? (
-                            <tr><td colSpan={10} className="h-28 text-center text-destructive">{error}</td></tr>
-                        ) : visiblePlayers.length === 0 ? (
-                            <tr>
-                                <td colSpan={10} className="py-12 text-center">
-                                    <div className="flex flex-col items-center justify-center gap-2">
-                                        <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
-                                            <Users size={24} className="text-muted-foreground" />
-                                        </IconContainer>
-                                        <p className="heading-card text-foreground font-semibold mt-1">Nenhum jogador cadastrado</p>
-                                        <p className="body-sm text-muted-foreground max-w-sm">Crie o primeiro jogador com nome e posição. Ele começa com 100,00 em caixa e sem clube.</p>
-                                        <DialogNewPlayer/>
-                                    </div>
-                                </td>
-                            </tr>
-                        ) : visiblePlayers.map((player) => (
-                            <tr key={player.name} className="h-14 border-b border-border last:border-b-0">
-                                <td className="px-4">
-                                    <div className="flex items-center gap-3">
-                                        <span className={`flex size-8 shrink-0 items-center justify-center rounded-full caption-xs-medium ${player.avatarClass}`}>{player.initials}</span>
-                                        <span className="flex flex-col whitespace-nowrap">
-                                            <span className="font-medium leading-5 text-foreground">{player.name}</span>
-                                            <span className="caption-xs-medium leading-4 text-muted-foreground">{player.positionLabel}</span>
-                                        </span>
-                                    </div>
-                                </td>
-                                <td className="px-2"><span className="inline-flex rounded-lg border border-border px-2 py-0.5 caption-xs">{player.position}</span></td>
-                                <td className="px-2 text-right body-sm-semibold">{player.overall}</td>
-                                <td className="px-2">
-                                    <div className="flex items-center justify-end gap-2">
-                                        <span>{player.agility}</span>
-                                        <span className="h-1.5 w-10 rounded-full bg-muted"><span className={`block h-1.5 rounded-full ${player.agility >= 75 ? "bg-success" : player.agility < 30 ? "bg-destructive" : "bg-muted-foreground"}`} style={{ width: `${Math.max(12, player.agility * 0.4)}px` }} /></span>
-                                    </div>
-                                </td>
-                                <td className="px-2 text-right body-sm">{player.age}</td>
-                                <td className="px-2"><ConditionBadge condition={player.condition} /></td>
-                                <td className="px-2 text-right text-muted-foreground body-sm">{player.baseValue.toFixed(2).replace(".", ",")}</td>
-                                <td className="px-2 text-right body-sm-semibold">{player.marketValue.toFixed(2).replace(".", ",")}</td>
-                                <td className="px-2">
-                                    {player.clubId !== null && player.clubId !== undefined ?
-                                        <div className="flex items-center gap-2 whitespace-nowrap"><span className="rounded bg-muted px-1 py-0.5 caption-xs-medium">
-                                            {player.clubCode ?? "Clube"}
-                                        </span><u>{player.clubName ?? "Clube"}</u>
-                                        </div> :
-                                        <div className="flex items-center gap-2 whitespace-nowrap">
-                                            <span className="rounded-lg bg-muted px-2 py-1 caption-xs-medium">Livre</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => setPlayerToBuy(player)}
-                                                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-3 hover:bg-muted transition-colors">
-                                                <ShoppingCart size={16} />
-                                                Comprar
-                                            </button>
-                                        </div>
-                                    }
-                                </td>
-                                <td className="px-2 text-right">
-                                    <Dropdown
-                                        player={player.name}
-                                        buttonText={<MoreHorizontal size={16} />}
-                                        items={[
-                                            {
-                                                label: "Ver detalhes",
-                                                icon: <Eye size={16} />,
-                                                onClick: () => setPlayerDetails(player),
-                                            },
-                                            {
-                                                label: "Editar",
-                                                icon: <Pencil size={16} />,
-                                                onClick: () => setPlayerEdited(player),
-                                            },
-                                            {
-                                                label: "Alterar Condição",
-                                                icon: <HeartPulse size={16} />,
-                                                onClick: () => setPlayerConditionChanged(player),
-                                            },
-                                            {
-                                                label: "Comprar",
-                                                icon: <ShoppingCart size={16} />,
-                                                onClick: () => setPlayerToBuy(player),
-                                            },
-                                            {
-                                                label: "Excluir",
-                                                icon: <Trash2 size={16} />,
-                                                onClick: () => setPlayerIsDeleted(player),
-                                            }
-                                        ]}
-                                    />
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+  return (
+    <section className="w-full overflow-hidden rounded-xl border border-border bg-card">
+      <header className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
+        <div className="flex items-center rounded-[10px] bg-muted p-0.75 text-sm">
+          {(["Todos", "Livres", "Em clubes"] as const).map((item) => {
+            const count = item === tab ? totalItems : "—";
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => changeTab(item)}
+                className={`flex h-7.5 items-center justify-center gap-1.5 rounded-lg px-2.5 ${tab === item ? "bg-background font-medium text-foreground" : "text-muted-foreground"}`}
+              >
+                {item}
+                <span className="body-sm">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <SortTable
+          options={PLAYER_SORT_OPTIONS}
+          value={sortOption}
+          onChange={setSortOption}
+        />
+      </header>
 
-            <footer className="flex items-center justify-between border-t border-border px-4 py-3 body-sm">
-                <span className="text-muted-foreground">Mostrando {visiblePlayers.length ? (page - 1) * 10 + 1 : 0}–{(page - 1) * 10 + visiblePlayers.length} de {totalItems} jogadores</span>
-                <nav aria-label="Paginação" className="flex items-center gap-1">
-                    <button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="flex items-center gap-1 px-2 text-muted-foreground disabled:opacity-50"><ChevronLeft size={16} />Anterior</button>
-                    <PaginationItem active>1</PaginationItem>
-                    {totalPages > 1 && <PaginationItem>{page === 2 ? "2" : "2"}</PaginationItem>}
-                    {totalPages > 2 && <PaginationItem>{page === 3 ? "3" : "3"}</PaginationItem>}
-                    <button type="button" disabled={page >= totalPages} onClick={() => setPage((current) => current + 1)} className="flex items-center gap-1 px-2 disabled:opacity-50">Próxima<ChevronRight size={16} /></button>
-                </nav>
-            </footer>
-
-            {playerIsDeleted && (
-                <DialogDelete
-                    open={!!playerIsDeleted}
-                    onOpenChange={(open) => !open && setPlayerIsDeleted(null)}
-                    player={playerIsDeleted}
-                    onCancel={() => setPlayerIsDeleted(null)}
-                    onConfirm={() => { setPlayerIsDeleted(null) }} />
-            )}
-            {
-                playerConditionChanged && (
-                    <DialogCondition
-                        open={!!playerConditionChanged}
-                        onOpenChange={(open) => !open && setPlayerConditionChanged(null)}
-                        player={playerConditionChanged}
-                        onCancel={() => setPlayerConditionChanged(null)}
-                        onConfirm={() => { setPlayerConditionChanged(null) }} />
-                )}
-            {
-                playerEdited && (
-                    <DialogEdit
-                        open={!!playerEdited}
-                        onOpenChange={(open) => !open && setPlayerEdited(null)}
-                        player={playerEdited}
-                        onConfirm={() => { setPlayerEdited(null) }} />
-                )
-            }
-            {
-                playerDetails && (
-                    <DrawerInfo
-                        player={playerDetails}
-                        open={true}
-                        onOpenChange={(open) => {
-                            if (!open) setPlayerDetails(null);
-                        }}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-280 border-collapse body-sm-medium">
+          <thead className="bg-muted text-muted-foreground">
+            <tr className="h-10 border-b border-border text-left body-sm-medium">
+              <th className="w-auto px-4">Jogador</th>
+              <th className="w-15 px-2">Posição</th>
+              <th className="w-16 px-2 text-right">Overall</th>
+              <th className="w-21 px-2 text-right">Agilidade</th>
+              <th className="w-13 px-2 text-right">Idade</th>
+              <th className="w-33 px-2">Condição</th>
+              <th className="w-22 px-2 text-right">Valor base</th>
+              <th className="w-33 px-2 text-right">Valor de mercado</th>
+              <th className="w-26 px-2">Clube</th>
+              <th className="w-35 px-2" />
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={10}
+                  className="h-28 text-center text-muted-foreground"
+                >
+                  Carregando jogadores...
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={10} className="h-28 text-center text-destructive">
+                  {error}
+                </td>
+              </tr>
+            ) : visiblePlayers.length === 0 ? (
+              <tr>
+                <td colSpan={10} className="py-12 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
+                      <Users size={24} className="text-muted-foreground" />
+                    </IconContainer>
+                    <p className="heading-card text-foreground font-semibold mt-1">
+                      Nenhum jogador cadastrado
+                    </p>
+                    <p className="body-sm text-muted-foreground max-w-sm">
+                      Crie o primeiro jogador com nome e posição. Ele começa com
+                      100,00 em caixa e sem clube.
+                    </p>
+                    <DialogNewPlayer />
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              visiblePlayers.map((player) => (
+                <tr
+                  key={player.name}
+                  className="h-14 border-b border-border last:border-b-0"
+                >
+                  <td className="px-4">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`flex size-8 shrink-0 items-center justify-center rounded-full caption-xs-medium ${player.avatarClass}`}
+                      >
+                        {player.initials}
+                      </span>
+                      <span className="flex flex-col whitespace-nowrap">
+                        <span className="font-medium leading-5 text-foreground">
+                          {player.name}
+                        </span>
+                        <span className="caption-xs-medium leading-4 text-muted-foreground">
+                          {player.positionLabel}
+                        </span>
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-2">
+                    <span className="inline-flex rounded-lg border border-border px-2 py-0.5 caption-xs">
+                      {player.position}
+                    </span>
+                  </td>
+                  <td className="px-2 text-right body-sm-semibold">
+                    {player.overall}
+                  </td>
+                  <td className="px-2">
+                    <div className="flex items-center justify-end gap-2">
+                      <span>{player.agility}</span>
+                      <span className="h-1.5 w-10 rounded-full bg-muted">
+                        <span
+                          className={`block h-1.5 rounded-full ${player.agility >= 75 ? "bg-success" : player.agility < 30 ? "bg-destructive" : "bg-muted-foreground"}`}
+                          style={{
+                            width: `${Math.max(12, player.agility * 0.4)}px`,
+                          }}
+                        />
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-2 text-right body-sm">{player.age}</td>
+                  <td className="px-2">
+                    <ConditionBadge condition={player.condition} />
+                  </td>
+                  <td className="px-2 text-right text-muted-foreground body-sm">
+                    {player.baseValue.toFixed(2).replace(".", ",")}
+                  </td>
+                  <td className="px-2 text-right body-sm-semibold">
+                    {player.marketValue.toFixed(2).replace(".", ",")}
+                  </td>
+                  <td className="px-2">
+                    {player.clubId !== null && player.clubId !== undefined ? (
+                      <div className="flex items-center gap-2 whitespace-nowrap">
+                        <span className="rounded bg-muted px-1 py-0.5 caption-xs-medium">
+                          {player.clubCode ?? "Clube"}
+                        </span>
+                        <u>{player.clubName ?? "Clube"}</u>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 whitespace-nowrap">
+                        <span className="rounded-lg bg-muted px-2 py-1 caption-xs-medium">
+                          Livre
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setPlayerToBuy(player)}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background px-3 hover:bg-muted transition-colors"
+                        >
+                          <ShoppingCart size={16} />
+                          Comprar
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-2 text-right">
+                    <Dropdown
+                      player={player.name}
+                      buttonText={<MoreHorizontal size={16} />}
+                      items={[
+                        {
+                          label: "Ver detalhes",
+                          icon: <Eye size={16} />,
+                          onClick: () => setPlayerDetails(player),
+                        },
+                        {
+                          label: "Editar",
+                          icon: <Pencil size={16} />,
+                          onClick: () => setPlayerEdited(player),
+                        },
+                        {
+                          label: "Alterar Condição",
+                          icon: <HeartPulse size={16} />,
+                          onClick: () => setPlayerConditionChanged(player),
+                        },
+                        {
+                          label: "Comprar",
+                          icon: <ShoppingCart size={16} />,
+                          onClick: () => setPlayerToBuy(player),
+                        },
+                        {
+                          label: "Excluir",
+                          icon: <Trash2 size={16} />,
+                          onClick: () => setPlayerIsDeleted(player),
+                        },
+                      ]}
                     />
-                )
-            }
-            {
-                playerToBuy && (
-                    <DialogBuy
-                        open={!!playerToBuy}
-                        onOpenChange={(open) => !open && setPlayerToBuy(null)}
-                        player={playerToBuy}
-                        onConfirm={() => { setPlayerToBuy(null) }} />
-                )
-            }
-        </section>
-    );
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <footer className="flex items-center justify-between border-t border-border px-4 py-3 body-sm">
+        <span className="text-muted-foreground">
+          Mostrando {visiblePlayers.length ? (page - 1) * 10 + 1 : 0}–
+          {(page - 1) * 10 + visiblePlayers.length} de {totalItems} jogadores
+        </span>
+        <nav aria-label="Paginação" className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={page <= 1}
+            onClick={() => setPage((current) => current - 1)}
+            className="flex items-center gap-1 px-2 text-muted-foreground disabled:opacity-50"
+          >
+            <ChevronLeft size={16} />
+            Anterior
+          </button>
+          <PaginationItem active>1</PaginationItem>
+          {totalPages > 1 && (
+            <PaginationItem>{page === 2 ? "2" : "2"}</PaginationItem>
+          )}
+          {totalPages > 2 && (
+            <PaginationItem>{page === 3 ? "3" : "3"}</PaginationItem>
+          )}
+          <button
+            type="button"
+            disabled={page >= totalPages}
+            onClick={() => setPage((current) => current + 1)}
+            className="flex items-center gap-1 px-2 disabled:opacity-50"
+          >
+            Próxima
+            <ChevronRight size={16} />
+          </button>
+        </nav>
+      </footer>
+
+      {playerIsDeleted && (
+        <DialogDelete
+          open={!!playerIsDeleted}
+          onOpenChange={(open) => !open && setPlayerIsDeleted(null)}
+          player={playerIsDeleted}
+          onCancel={() => setPlayerIsDeleted(null)}
+          onConfirm={() => {
+            setPlayerIsDeleted(null);
+          }}
+        />
+      )}
+      {playerConditionChanged && (
+        <DialogCondition
+          open={!!playerConditionChanged}
+          onOpenChange={(open) => !open && setPlayerConditionChanged(null)}
+          player={playerConditionChanged}
+          onCancel={() => setPlayerConditionChanged(null)}
+          onConfirm={() => {
+            setPlayerConditionChanged(null);
+          }}
+        />
+      )}
+      {playerEdited && (
+        <DialogEdit
+          open={!!playerEdited}
+          onOpenChange={(open) => !open && setPlayerEdited(null)}
+          player={playerEdited}
+          onConfirm={() => {
+            setPlayerEdited(null);
+          }}
+        />
+      )}
+      {playerDetails && (
+        <DrawerInfo
+          player={playerDetails}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open) setPlayerDetails(null);
+          }}
+        />
+      )}
+      {playerToBuy && (
+        <DialogBuy
+          open={!!playerToBuy}
+          onOpenChange={(open) => !open && setPlayerToBuy(null)}
+          player={playerToBuy}
+          onConfirm={() => {
+            setPlayerToBuy(null);
+          }}
+        />
+      )}
+    </section>
+  );
 }

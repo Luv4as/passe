@@ -20,7 +20,9 @@ export const metadata: Metadata = {
   description: "Gestão da liga, do mercado à classificação",
 };
 
-export default function RootLayout({ children }: Readonly<{
+export default function RootLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
@@ -31,9 +33,7 @@ export default function RootLayout({ children }: Readonly<{
       <body className="h-full min-h-screen w-full bg-background text-foreground antialiased m-0 p-0">
         <HeaderActionProvider>
           <Toaster>
-            <SidebarProvider>
-              {children}
-            </SidebarProvider>
+            <SidebarProvider>{children}</SidebarProvider>
           </Toaster>
         </HeaderActionProvider>
       </body>

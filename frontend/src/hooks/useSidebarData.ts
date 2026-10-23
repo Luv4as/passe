@@ -75,12 +75,16 @@ export function useSidebarData(): SidebarData {
         setLoading(true);
 
         const [playersRes, clubsRes, matchesRes] = await Promise.all([
-          fetchApi<PlayersApiResponse>("/players").catch((): PlayersApiResponse => ({
-            meta: { total_items: 0 },
-            total: 0,
-            data: [],
-          })),
-          fetchApi<ApiClub[] | { data: ApiClub[] }>("/clubs").catch((): ApiClub[] => []),
+          fetchApi<PlayersApiResponse>("/players").catch(
+            (): PlayersApiResponse => ({
+              meta: { total_items: 0 },
+              total: 0,
+              data: [],
+            }),
+          ),
+          fetchApi<ApiClub[] | { data: ApiClub[] }>("/clubs").catch(
+            (): ApiClub[] => [],
+          ),
           fetchApi<MatchSummary[]>("/matches").catch((): MatchSummary[] => []),
         ]);
 
@@ -100,13 +104,16 @@ export function useSidebarData(): SidebarData {
           nome: club.nome || club.name || "",
         }));
 
-        const matchesList: MatchSummary[] = Array.isArray(matchesRes) ? matchesRes : [];
+        const matchesList: MatchSummary[] = Array.isArray(matchesRes)
+          ? matchesRes
+          : [];
         const matchesCount = matchesList.length;
 
         const latestMatch =
           matchesList.length > 0
             ? matchesList.reduce((latest, current) => {
-                return new Date(current.played_at).getTime() > new Date(latest.played_at).getTime()
+                return new Date(current.played_at).getTime() >
+                  new Date(latest.played_at).getTime()
                   ? current
                   : latest;
               }, matchesList[0])

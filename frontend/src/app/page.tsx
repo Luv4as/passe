@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useEffect, useMemo } from "react";
 import Image from "next/image";
@@ -15,7 +15,7 @@ import {
   Trophy,
   Users,
   UserCheck,
-  Tag
+  Tag,
 } from "lucide-react";
 
 import { useGetClubs } from "@/src/hooks/useGetClubs";
@@ -49,13 +49,13 @@ export default function LandingPage() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [router]);
 
-
   const totalPlayers = meta?.total_items || players?.length || 0;
-
 
   const freePlayers = useMemo(() => {
     if (!players || players.length === 0) return 0;
-    return players.filter((p) => p.clubId === null || p.clubId === undefined || p.clubId === 0).length;
+    return players.filter(
+      (p) => p.clubId === null || p.clubId === undefined || p.clubId === 0,
+    ).length;
   }, [players]);
 
   const totalClubs = clubs?.length ?? 0;
@@ -68,13 +68,11 @@ export default function LandingPage() {
 
   return (
     <div className="w-full h-full bg-background flex flex-col items-center justify-center p-4 sm:p-8">
-
       <div className="absolute inset-0 pointer-events-none opacity-5 flex justify-between items-center px-12">
         <div className="w-32 h-64 border border-foreground rounded-r-full" />
         <div className="w-40 h-40 border border-foreground rounded-full" />
         <div className="w-32 h-64 border border-foreground rounded-l-full" />
       </div>
-
 
       <div className="flex items-center gap-3 mb-6 z-10">
         <Image
@@ -91,12 +89,20 @@ export default function LandingPage() {
       </div>
 
       <div className="mb-6 z-10">
-        <Badge variant="outline" className="border-border bg-background px-3 py-1 rounded-full text-muted-foreground flex items-center gap-2">
+        <Badge
+          variant="outline"
+          className="border-border bg-background px-3 py-1 rounded-full text-muted-foreground flex items-center gap-2"
+        >
           <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-          <span className="caption-xs-medium text-foreground">Liga Fictícia 2026</span>
+          <span className="caption-xs-medium text-foreground">
+            Liga Fictícia 2026
+          </span>
           <span className="text-border">·</span>
           <span className="caption-xs text-muted-foreground">
-            Líder: {leader ? `${leader.clubName}, ${leader.points} pontos` : "Calculando..."}
+            Líder:{" "}
+            {leader
+              ? `${leader.clubName}, ${leader.points} pontos`
+              : "Calculando..."}
           </span>
         </Badge>
       </div>
@@ -106,15 +112,17 @@ export default function LandingPage() {
       </h1>
 
       <p className="body text-muted-foreground max-w-2xl mb-8 z-10 text-center">
-        Cadastre jogadores, monte os clubes e negocie com contrato de fidelidade. Depois,
-        escale os titulares e jogue partidas com placar calculatedo pelos atributos.
+        Cadastre jogadores, monte os clubes e negocie com contrato de
+        fidelidade. Depois, escale os titulares e jogue partidas com placar
+        calculatedo pelos atributos.
       </p>
 
       <div className="flex flex-row items-center gap-3 mb-10 z-10">
         <Button
           size="lg"
           className="rounded-xl px-8 body-sm-medium"
-          onClick={() => router.push(`/market/players`)}>
+          onClick={() => router.push(`/market/players`)}
+        >
           Iniciar
           <ArrowRight size={18} className="ml-2" />
         </Button>
@@ -129,28 +137,41 @@ export default function LandingPage() {
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 caption-xs text-muted-foreground mb-12 z-10">
         <div className="flex items-center gap-1.5">
           <Users size={14} className="text-muted-foreground" />
-          <span className="caption-xs-semibold text-foreground">{totalPlayers}</span>
+          <span className="caption-xs-semibold text-foreground">
+            {totalPlayers}
+          </span>
           jogadores
         </div>
         <span className="text-border">·</span>
         <div className="flex items-center gap-1.5">
           <UserCheck size={14} className="text-muted-foreground" />
-          <span className="caption-xs-semibold text-foreground">{freePlayers}</span> livres
+          <span className="caption-xs-semibold text-foreground">
+            {freePlayers}
+          </span>{" "}
+          livres
         </div>
         <span className="text-border">·</span>
         <div className="flex items-center gap-1.5">
           <Shield size={14} className="text-muted-foreground" />
-          <span className="caption-xs-semibold text-foreground">{totalClubs}</span> clubes
+          <span className="caption-xs-semibold text-foreground">
+            {totalClubs}
+          </span>{" "}
+          clubes
         </div>
         <span className="text-border">·</span>
         <div className="flex items-center gap-1.5">
           <Swords size={14} className="text-muted-foreground" />
-          <span className="caption-xs-semibold text-foreground">{totalMatches}</span> partidas
+          <span className="caption-xs-semibold text-foreground">
+            {totalMatches}
+          </span>{" "}
+          partidas
         </div>
         <span className="text-border">·</span>
         <div className="flex items-center gap-1.5">
           <CheckCircle2 size={14} className="text-success" />
-          <span className="caption-xs-semibold text-foreground">Não precisa de login</span>
+          <span className="caption-xs-semibold text-foreground">
+            Não precisa de login
+          </span>
         </div>
       </div>
 
@@ -160,11 +181,14 @@ export default function LandingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Users size={16} />
             </div>
-            <span className="text-xs font-mono font-bold text-muted-foreground">01</span>
+            <span className="text-xs font-mono font-bold text-muted-foreground">
+              01
+            </span>
           </div>
           <h4 className="body-sm-medium text-foreground mb-1">Jogadores</h4>
           <p className="caption-xs text-muted-foreground leading-relaxed">
-            Nascem livres e Apto; o valor de mercado vem da condição, agilidade e idade.
+            Nascem livres e Apto; o valor de mercado vem da condição, agilidade
+            e idade.
           </p>
         </div>
 
@@ -173,7 +197,9 @@ export default function LandingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Shield size={16} />
             </div>
-            <span className="text-xs font-mono font-bold text-muted-foreground">02</span>
+            <span className="text-xs font-mono font-bold text-muted-foreground">
+              02
+            </span>
           </div>
           <h4 className="body-sm-medium text-foreground mb-1">Clubes</h4>
           <p className="caption-xs text-muted-foreground leading-relaxed">
@@ -186,7 +212,9 @@ export default function LandingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <ShoppingCart size={16} />
             </div>
-            <span className="text-xs font-mono font-bold text-muted-foreground">03</span>
+            <span className="text-xs font-mono font-bold text-muted-foreground">
+              03
+            </span>
           </div>
           <h4 className="body-sm-medium text-foreground mb-1">Compra</h4>
           <p className="caption-xs text-muted-foreground leading-relaxed">
@@ -199,7 +227,9 @@ export default function LandingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Tag size={16} />
             </div>
-            <span className="text-xs font-mono font-bold text-muted-foreground">04</span>
+            <span className="text-xs font-mono font-bold text-muted-foreground">
+              04
+            </span>
           </div>
           <h4 className="body-sm-medium text-foreground mb-1">Venda</h4>
           <p className="caption-xs text-muted-foreground leading-relaxed">
@@ -212,7 +242,9 @@ export default function LandingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Clock size={16} />
             </div>
-            <span className="text-xs font-mono font-bold text-muted-foreground">05</span>
+            <span className="text-xs font-mono font-bold text-muted-foreground">
+              05
+            </span>
           </div>
           <h4 className="body-sm-medium text-foreground mb-1">Histórico</h4>
           <p className="caption-xs text-muted-foreground leading-relaxed">
@@ -225,7 +257,9 @@ export default function LandingPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Trophy size={16} />
             </div>
-            <span className="text-xs font-mono font-bold text-muted-foreground">06</span>
+            <span className="text-xs font-mono font-bold text-muted-foreground">
+              06
+            </span>
           </div>
           <h4 className="body-sm-medium text-foreground mb-1">Liga</h4>
           <p className="caption-xs text-muted-foreground leading-relaxed">

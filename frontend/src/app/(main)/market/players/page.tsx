@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { DialogNewPlayer } from "@/src/components/dialogNewPlayer";
 import PlayersTable from "@/src/components/playersTable";
@@ -7,20 +7,18 @@ import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useEffect, useState } from "react";
 
 export default function PlayersPage() {
-    const { setHeaderAction } = useHeaderAction();
-    const [filters, setFilters] = useState<TableFilters>({});
+  const { setHeaderAction } = useHeaderAction();
+  const [filters, setFilters] = useState<TableFilters>({});
 
-    useEffect(() => {
-        setHeaderAction(
-            <DialogNewPlayer/>
-        );
-        return () => setHeaderAction(null);
-    }, [setHeaderAction]);
+  useEffect(() => {
+    setHeaderAction(<DialogNewPlayer />);
+    return () => setHeaderAction(null);
+  }, [setHeaderAction]);
 
-    return (
-        <div>
-            <TableFilter filters={filters} onFiltersChange={setFilters} />
-            <PlayersTable key={JSON.stringify(filters)} filters={filters} />
-        </div>
-    )
+  return (
+    <div>
+      <TableFilter filters={filters} onFiltersChange={setFilters} />
+      <PlayersTable key={JSON.stringify(filters)} filters={filters} />
+    </div>
+  );
 }

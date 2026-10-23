@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { PlayersModule } from './modules/players/players.module';
 import { ClubsModule } from './modules/clubs/clubs.module';
 import { MarketModule } from './modules/market/maket.module';
 import { LeagueModule } from './modules/league/league.module';
+import { HTTPLoggerMiddleware } from './common/middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -18,4 +19,10 @@ import { LeagueModule } from './modules/league/league.module';
     LeagueModule,
   ],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(HTTPLoggerMiddleware)
+      .forRoutes('*'); 
+  }
+}
