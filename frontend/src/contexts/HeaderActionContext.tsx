@@ -9,6 +9,8 @@ interface HeaderActionContextType {
   setHeaderDescription: (description: React.ReactNode | null) => void;
   customTitle: string | null;
   setCustomTitle: (title: string | null) => void;
+  hideHeader: boolean;
+  setHideHeader: (hide: boolean) => void;
 }
 
 const HeaderActionContext = createContext<HeaderActionContextType | undefined>(
@@ -26,6 +28,7 @@ export function HeaderActionProvider({
   const [customTitle, setCustomTitle] = useState<string | null>(null);
   const [headerDescription, setHeaderDescription] =
     useState<React.ReactNode | null>(null);
+  const [hideHeader, setHideHeader] = useState<boolean>(false);
   return (
     <HeaderActionContext.Provider
       value={{
@@ -35,6 +38,8 @@ export function HeaderActionProvider({
         setCustomTitle,
         headerDescription,
         setHeaderDescription,
+        hideHeader,
+        setHideHeader,
       }}
     >
       {children}

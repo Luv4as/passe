@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { headerAction, headerDescription, customTitle } = useHeaderAction();
+  const { headerAction, headerDescription, customTitle, hideHeader } = useHeaderAction();
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
 
@@ -88,24 +88,26 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       </header>
 
       <main className="flex-1 py-7 px-8">
-        <div className="flex flex-row items-baseline justify-between mb-6 gap-2">
-          <div className="flex flex-row items-center gap-4">
-            <div>
-              <IconContainer className="bg-primary-soft border border-primary h-12 w-12">
-                {getPageIcon()}
-              </IconContainer>
-            </div>
-            <div className="flex flex-col gap-1">
-              <h1 className="text-2xl heading">
-                {customTitle ?? routeFormatted[routeFormatted.length - 1]}
-              </h1>
-              <div className="body-sm text-muted-foreground">
-                {headerDescription ?? getPageDescription()}
+        {!hideHeader && (
+          <div className="flex flex-row items-baseline justify-between mb-6 gap-2">
+            <div className="flex flex-row items-center gap-4">
+              <div>
+                <IconContainer className="bg-primary-soft border border-primary h-12 w-12">
+                  {getPageIcon()}
+                </IconContainer>
+              </div>
+              <div className="flex flex-col gap-1">
+                <h1 className="text-2xl heading">
+                  {customTitle ?? routeFormatted[routeFormatted.length - 1]}
+                </h1>
+                <div className="body-sm text-muted-foreground">
+                  {headerDescription ?? getPageDescription()}
+                </div>
               </div>
             </div>
+            {headerAction}
           </div>
-          {headerAction}
-        </div>
+        )}
         {children}
       </main>
     </SidebarInset>
