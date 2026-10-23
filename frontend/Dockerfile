@@ -12,13 +12,13 @@ FROM node:22-alpine AS runtime
 
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=5173
+ENV HOSTNAME="0.0.0.0"
 
-COPY package*.json ./
-RUN npm ci --omit=dev
-COPY --from=build /app/.next ./.next
+COPY --from=build /app/.next/standalone ./
+COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
-COPY --from=build /app/next.config.ts ./next.config.ts
 
 EXPOSE 5173
 
-CMD ["npm", "run", "start"]
+CMD ["node", "server.js"]

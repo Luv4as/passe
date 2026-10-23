@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
@@ -18,8 +19,7 @@ services:
   backend:
     build:
       context: ./backend
-    profiles:
-      - full
+    restart: always
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -29,18 +29,26 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   frontend:
     build:
       context: ./frontend
-    profiles:
-      - full
+    restart: always
     environment:
       NODE_ENV: production
+      HOSTNAME: "0.0.0.0"  
+      PORT: 5173
     ports:
       - "5173:5173"
     depends_on:
-      - backend
+      backend:        
+        condition: service_healthy
 
 volumes:
   postgres_data:
