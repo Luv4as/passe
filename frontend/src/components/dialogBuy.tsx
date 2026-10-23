@@ -77,7 +77,7 @@ export function DialogBuy({ open, onOpenChange, onConfirm, player }: DialogBuyPr
                                         {error}
                                     </div>
                                 )}
-                                <CardPlayer player={player} marketValue={player.marketValue}></CardPlayer>
+                                <CardPlayer player= {player} marketValue={player.marketValue}></CardPlayer>
                                 <div className="flex flex-col gap-2 w-full">
                                     <Label>
                                         Clube comprador

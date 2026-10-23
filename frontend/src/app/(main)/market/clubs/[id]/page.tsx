@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardInfos } from "@/components/ui/card-infos";
+import { ClubPlayersTable } from "@/src/components/clubPlayersTable";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
 import { useGetClub } from "@/src/hooks/useGetClub";
 import { Coins, Landmark, Shirt, ShoppingCart, Wallet } from "lucide-react";
@@ -43,10 +44,10 @@ function ClubContent({ params }: ClubPageProps) {
             setHeaderAction(
                 <div className="flex flex-row items-center gap-2">
                     <Button
-                    type="button"
-                    onClick={() => 
-                        router.push(`/market/players`)
-                    }>
+                        type="button"
+                        onClick={() =>
+                            router.push(`/market/players`)
+                        }>
                         <ShoppingCart size={16} />
                         Comprar Jogadores
                     </Button>
@@ -96,7 +97,8 @@ function ClubContent({ params }: ClubPageProps) {
                     unit="jogadores"
                     description="Limite de 12 jogadores" />
             </div>
-
+            <ClubPlayersTable />
+            <p className="caption-xs text-muted-foreground">Valor de mercado, dias restantes e % de multa calculados para uma venda agora (12/11/2026, 15:00). A multa tem teto de 10,00.</p>
         </div>
     )
 }
