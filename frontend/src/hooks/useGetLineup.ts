@@ -1,44 +1,115 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { fetchApi } from "../lib/api";
 
-interface LineupResponse {
+export type Formation = "3-1" | "2-2" | "2-1-1" | "1-2-1";
+
+export interface LineupPlayer {
+  id: number;
+  name: string;
+  position: string;
+  agility: number;
+  age: number;
+  condition: "APTO" | "MAL_CONDICIONADO" | "DOENTE" | "SUSPENSO";
+  baseValue: number;
+  marketValue: number;
+  pace: number;
+  shooting: number;
+  passing: number;
+  dribbling: number;
+  defending: number;
+  physical: number;
+  potential: number;
+  overall: number;
+  clubId: number;
+}
+
+interface LineupPlayerRaw {
+  id: number;
+  name: string;
+  position: string;
+  agility: number;
+  age: number;
+  condition: "APTO" | "MAL_CONDICIONADO" | "DOENTE" | "SUSPENSO";
+  base_value: number;
+  market_value: number;
+  pace: number;
+  shooting: number;
+  passing: number;
+  dribbling: number;
+  defending: number;
+  physical: number;
+  potential: number;
+  overall: number;
   club_id: number;
-  formation: string | null;
+}
+
+export interface LineupData {
+  clubId: number;
+  formation: Formation | null;
   complete: boolean;
-  players: Array<{ id: number; name: string }>;
+  players: LineupPlayer[];
+}
+
+interface LineupRawResponse {
+  club_id: number;
+  formation: Formation | null;
+  complete: boolean;
+  players: LineupPlayerRaw[];
 }
 
 export function useGetLineup(clubId?: number | null) {
-  const [lineup, setLineup] = useState<LineupResponse | null>(null);
+  const [lineup, setLineup] = useState<LineupData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const getLineup = useCallback(async () => {
     if (!clubId) return;
 
-    let isMounted = true;
+    setLoading(true);
+    setError(null);
 
-    queueMicrotask(() => {
-      if (isMounted) setLoading(true);
-    });
+    try {
+      const response = await fetchApi<LineupRawResponse>(`/clubs/${clubId}/lineup`);
 
-    fetchApi<LineupResponse>(`/clubs/${clubId}/lineup`)
-      .then((data) => {
-        if (isMounted) setLineup(data);
-      })
-      .catch(() => {
-        if (isMounted) setLineup(null);
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
-      });
+      const mappedLineup: LineupData = {
+        clubId: response.club_id,
+        formation: response.formation,
+        complete: response.complete,
+        players: (response.players || []).map((p) => ({
+          id: p.id,
+          name: p.name,
+          position: p.position,
+          agility: p.agility,
+          age: p.age,
+          condition: p.condition,
+          baseValue: p.base_value,
+          marketValue: p.market_value,
+          pace: p.pace,
+          shooting: p.shooting,
+          passing: p.passing,
+          dribbling: p.dribbling,
+          defending: p.defending,
+          physical: p.physical,
+          potential: p.potential,
+          overall: p.overall,
+          clubId: p.club_id,
+        })),
+      };
 
-    return () => {
-      isMounted = false;
-    };
+      setLineup(mappedLineup);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erro ao carregar a escalação";
+      setError(errorMessage);
+      setLineup(null);
+    } finally {
+      setLoading(false);
+    }
   }, [clubId]);
 
   return {
-    lineup: clubId ? lineup : null,
-    loading: clubId ? loading : false,
+    lineup,
+    loading,
+    error,
+    getLineup,
   };
 }

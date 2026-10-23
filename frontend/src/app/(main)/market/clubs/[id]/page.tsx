@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardInfos } from "@/components/ui/card-infos";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ClubLineupTab } from "@/src/components/clubLineupTab";
 import { ClubPlayersTable } from "@/src/components/clubPlayersTable";
 import { ClubTransactionsTable } from "@/src/components/clubTransactionsTable";
 import { useHeaderAction } from "@/src/contexts/HeaderActionContext";
@@ -15,7 +16,6 @@ import {
     ShoppingCart,
     Wallet,
     History,
-    ClipboardList,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation"; // 1. Adicionado useSearchParams
 import { Suspense, use, useEffect } from "react";
@@ -158,7 +158,6 @@ function ClubContent({ params }: ClubPageProps) {
                         value="escalacao"
                         className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:bg-transparent rounded-none px-1 pb-3 pt-2 font-medium flex items-center gap-2"
                     >
-                        <ClipboardList size={16} />
                         Escalação
                     </TabsTrigger>
 
@@ -181,7 +180,11 @@ function ClubContent({ params }: ClubPageProps) {
 
                 <TabsContent value="escalacao" className="mt-4">
                     <div className="p-8 border border-border rounded-xl bg-card text-center text-muted-foreground">
-                        Selecione os 5 titulares e a formação tática do {club.name}.
+                        <ClubLineupTab
+                            clubId={clubId}
+                            clubName={club.name}
+                            allPlayers={club.players}
+                        />
                     </div>
                 </TabsContent>
 
