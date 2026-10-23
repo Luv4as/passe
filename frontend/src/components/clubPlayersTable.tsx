@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useGetClub, ClubPlayerItem } from "../hooks/useGetClub";
 import { IconContainer } from "@/components/ui/icon-container";
-import { Users, Tag, Info, Shirt } from "lucide-react";
+import { Tag, Info, Shirt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   formatDate,

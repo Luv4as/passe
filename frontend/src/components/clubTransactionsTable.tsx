@@ -34,11 +34,9 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
     const { transactions, summary, loading, error, getTransactions } = useGetTransactions();
     const { exportTransactions, exporting } = useExportTransactions();
 
-    // Estados dos Filtros
     const [selectedTypes, setSelectedTypes] = useState<TransactionType[]>(["COMPRA", "VENDA"]);
     const [selectedPlayerId, setSelectedPlayerId] = useState<string>("TODOS");
 
-    // Recarrega os dados da API sempre que os filtros mudam
     useEffect(() => {
         if (!clubId) return;
 
@@ -50,7 +48,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
         void getTransactions(clubId, filters);
     }, [clubId, selectedTypes, selectedPlayerId, getTransactions]);
 
-    // Lista única de jogadores com ID e Nome para a combobox
     const uniquePlayers = useMemo(() => {
         const map = new Map<number, string>();
         transactions.forEach((tx) => {
@@ -61,14 +58,12 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
         return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
     }, [transactions]);
 
-    // Nome do jogador selecionado para renderizar no acionador do Select
     const selectedPlayerName = useMemo(() => {
         if (selectedPlayerId === "TODOS") return "Jogador: todos";
         const found = uniquePlayers.find((p) => String(p.id) === selectedPlayerId);
         return found ? found.name : "Jogador: todos";
     }, [selectedPlayerId, uniquePlayers]);
 
-    // Alternar filtros de tipo (Compra / Venda)
     const toggleType = (type: TransactionType) => {
         setSelectedTypes((prev) => {
             if (prev.includes(type)) {
@@ -108,7 +103,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
 
     return (
         <div className="flex flex-col gap-4 w-full">
-            {/* Header com Título e Botão de Exportação */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h3 className="text-lg font-bold text-foreground">Histórico de transações</h3>
@@ -128,11 +122,9 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                 </Button>
             </div>
 
-            {/* Barra de Filtros (Tipos e Combobox Jogador) */}
             <div className="flex flex-wrap items-center gap-3">
                 <span className="text-xs font-medium text-muted-foreground">Tipo</span>
 
-                {/* Botão Filtro Compra */}
                 <button
                     type="button"
                     onClick={() => toggleType("COMPRA")}
@@ -148,7 +140,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                     Compra
                 </button>
 
-                {/* Botão Filtro Venda */}
                 <button
                     type="button"
                     onClick={() => toggleType("VENDA")}
@@ -164,7 +155,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                     Venda
                 </button>
 
-                {/* Combobox do Jogador com exibiçao por nome e envio por ID */}
                 <div className="ml-auto sm:ml-0">
                     <Select
                         value={selectedPlayerId}
@@ -197,7 +187,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                     </p>
                 </div>
             ) : (
-                /* Tabela Principal */
                 <div className="w-full overflow-hidden rounded-xl border border-border bg-card">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left caption-xs border-collapse">
@@ -250,13 +239,11 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
 
                                         return (
                                             <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
-                                                {/* Data e Hora */}
                                                 <td className="py-3 px-4 whitespace-nowrap text-muted-foreground">
                                                     <span className="body-sm text-foreground">{dateStr}</span>{" "}
                                                     <span className="text-muted-foreground">{timeStr}</span>
                                                 </td>
 
-                                                {/* Badge do Tipo */}
                                                 <td className="py-3 px-4 whitespace-nowrap">
                                                     {tx.type === "COMPRA" ? (
                                                         <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 caption-xs text-foreground border border-border">
@@ -271,7 +258,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                                                     )}
                                                 </td>
 
-                                                {/* Avatar + Nome do Jogador */}
                                                 <td className="py-3 px-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2.5">
                                                         <span className={`flex size-6 shrink-0 items-center justify-center rounded-full text-[10px] caption-xs ${avatarClass}`}>
@@ -283,22 +269,18 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                                                     </div>
                                                 </td>
 
-                                                {/* Valor */}
                                                 <td className="py-3 px-4 text-right whitespace-nowrap body-sm text-foreground">
                                                     {formatCurrency(tx.value)}
                                                 </td>
 
-                                                {/* Taxa ou Comissão */}
                                                 <td className="py-3 px-4 text-right whitespace-nowrap body-sm text-foreground">
                                                     {formatCurrency(tx.fee)}
                                                 </td>
 
-                                                {/* Multa */}
                                                 <td className="py-3 px-4 text-right whitespace-nowrap body-sm text-muted-foreground">
                                                     {formatCurrency(tx.penalty)}
                                                 </td>
 
-                                                {/* Lucro */}
                                                 <td className="py-3 px-4 text-right whitespace-nowrap body-sm">
                                                     {tx.profit === null ? (
                                                         <span className="text-muted-foreground">—</span>
@@ -315,7 +297,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                                                     )}
                                                 </td>
 
-                                                {/* Variação do Caixa */}
                                                 <td className="py-3 px-4 text-right whitespace-nowrap body-sm">
                                                     {tx.cashChange > 0 ? (
                                                         <span className="text-success">
@@ -335,10 +316,8 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                         </table>
                     </div>
 
-                    {/* Grid dos Totais (Summary) no Rodapé da Tabela */}
                     {summary && (
                         <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-y md:divide-y-0 divide-border border-t border-border bg-muted/20">
-                            {/* Total Pago em Compras */}
                             <div className="p-3.5 flex flex-col gap-0.5">
                                 <div className="flex items-center gap-1.5 text-muted-foreground caption-xs">
                                     <ShoppingCart size={13} />
@@ -350,7 +329,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                                 <span className="caption-xs text-muted-foreground">Valor + taxa</span>
                             </div>
 
-                            {/* Total Recebido em Vendas */}
                             <div className="p-3.5 flex flex-col gap-0.5">
                                 <div className="flex items-center gap-1.5 text-muted-foreground caption-xs">
                                     <HandCoins size={13} />
@@ -362,7 +340,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                                 <span className="caption-xs text-muted-foreground">Crédito líquido</span>
                             </div>
 
-                            {/* Taxas e Comissões */}
                             <div className="p-3.5 flex flex-col gap-0.5">
                                 <div className="flex items-center gap-1.5 text-muted-foreground caption-xs">
                                     <Coins size={13} />
@@ -374,7 +351,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                                 <span className="caption-xs text-muted-foreground">Somadas</span>
                             </div>
 
-                            {/* Multas */}
                             <div className="p-3.5 flex flex-col gap-0.5">
                                 <div className="flex items-center gap-1.5 text-muted-foreground caption-xs">
                                     <AlertTriangle size={13} />
@@ -386,7 +362,6 @@ export function ClubTransactionsTable({ clubId }: ClubTransactionsTableProps) {
                                 <span className="caption-xs text-muted-foreground">Por fidelidade</span>
                             </div>
 
-                            {/* Lucro Total */}
                             <div className="p-3.5 flex flex-col gap-0.5">
                                 <div className="flex items-center gap-1.5 text-muted-foreground caption-xs">
                                     <TrendingUp size={13} />
