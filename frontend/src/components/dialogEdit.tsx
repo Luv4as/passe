@@ -10,7 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { UserRound } from "lucide-react";
+import { AlertCircle, UserRound } from "lucide-react";
+import { useMemo, useState } from "react";
 import { positions } from "../hooks/useCreatePlayer";
 import { Player } from "../hooks/useTableData";
 import { useToastManager } from "@/components/ui/toast";
@@ -27,36 +28,38 @@ function NumericField({
   id,
   label,
   value,
-  min,
-  max,
   onChange,
   hint,
+  error,
 }: {
   id: string;
   label: string;
   value: number;
-  min?: number;
-  max?: number;
   onChange: (value: number) => void;
   hint?: string;
+  error?: string;
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <label htmlFor={id} className="text-sm font-medium text-foreground">
+      <label htmlFor={id} className="body-sm-medium text-foreground">
         {label}
       </label>
       <Input
         id={id}
         name={id}
         type="number"
-        min={min ?? 1}
-        max={max ?? 99}
-        value={value}
+        value={value || ""}
         onChange={(event) => onChange(Number(event.target.value))}
+        className={error ? "border-destructive focus-visible:ring-destructive" : ""}
       />
-      {hint && (
-        <p className="text-xs leading-4 text-muted-foreground">{hint}</p>
-      )}
+      {error ? (
+        <p className="caption-xs flex items-center gap-1 font-medium text-destructive">
+          <AlertCircle size={12} className="shrink-0" />
+          {error}
+        </p>
+      ) : hint ? (
+        <p className="caption-xs leading-4 text-muted-foreground">{hint}</p>
+      ) : null}
     </div>
   );
 }
@@ -68,6 +71,7 @@ export function DialogEdit({
   player,
 }: DialogEditProps) {
   const toastManager = useToastManager();
+  const [touched, setTouched] = useState(false);
 
   const { form, saving, error, updateField, editPlayer } = useEditPlayer(
     player,
@@ -76,7 +80,7 @@ export function DialogEdit({
         const id = toastManager.add({
           type: "success",
           title: "Jogador editado",
-          description: `As informações de${player.name} foram salvas`,
+          description: `As informações de ${player.name} foram salvas`,
           actionProps: {
             onClick() {
               toastManager.close(id);
@@ -91,8 +95,31 @@ export function DialogEdit({
 
   const hasClub = Boolean(player?.clubId);
 
-  function handleSubmit(event: React.SubmitEvent) {
+  const fieldErrors = useMemo(() => {
+    const errors: Record<string, string> = {};
+
+    if (form.name.trim().length > 0 && form.name.trim().length < 3) {
+      errors.name = "Use de 3 a 100 caracteres.";
+    }
+
+    const minAge = player?.age ?? 16;
+    if (form.age < minAge || form.age > 45) {
+      errors.age = `Use uma idade de ${minAge} a 45 anos.`;
+    }
+
+    if (form.agility < 1 || form.agility > 100) {
+      errors.agility = "Use um valor de 1 a 100.";
+    }
+
+    return errors;
+  }, [form, player]);
+
+  const hasErrors = Object.keys(fieldErrors).length > 0;
+
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+    setTouched(true);
+    if (hasErrors) return;
     editPlayer(player.id);
   }
 
@@ -107,7 +134,13 @@ export function DialogEdit({
               Editar Jogador
             </DialogTitle>
             <DialogDescription>
-              Edite nome, posição, idade e agilidade. Os demais dados não mudam
+              {touched && hasErrors ? (
+                <span className="font-medium text-destructive">
+                  Corrija os campos destacados para salvar.
+                </span>
+              ) : (
+                "Edite nome, posição, idade e agilidade. Os demais dados não mudam."
+              )}
             </DialogDescription>
           </DialogHeader>
 
@@ -123,17 +156,25 @@ export function DialogEdit({
                 />
                 <Input
                   id="player-name"
-                  className="pl-9"
+                  className={`pl-9 ${
+                    fieldErrors.name ? "border-destructive focus-visible:ring-destructive" : ""
+                  }`}
                   value={form.name}
                   onChange={(event) => updateField("name", event.target.value)}
                   placeholder="Nome do jogador"
                   required
                 />
               </div>
-              <p className="caption-xs text-muted-foreground">
-                De 3 a 100 caracteres, com pelo menos duas palavras e sem
-                números.
-              </p>
+              {fieldErrors.name ? (
+                <p className="caption-xs flex items-center gap-1 font-medium text-destructive">
+                  <AlertCircle size={12} className="shrink-0" />
+                  {fieldErrors.name}
+                </p>
+              ) : (
+                <p className="caption-xs text-muted-foreground">
+                  De 3 a 100 caracteres, com pelo menos duas palavras e sem números.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -148,22 +189,15 @@ export function DialogEdit({
                       type="button"
                       disabled={isDisabled}
                       onClick={() => updateField("position", value)}
-                      className={`flex flex-col items-center rounded-lg border px-1 py-2 transition-colors 
-                                            ${
-                                              form.position === value
-                                                ? "border-primary bg-primary/5 text-primary"
-                                                : "border-border bg-background"
-                                            } 
-                                            ${
-                                              isDisabled
-                                                ? "opacity-50 cursor-not-allowed"
-                                                : "cursor-pointer"
-                                            } 
-                                            ${
-                                              isSelected
-                                                ? "border-primary bg-primary/10 text-primary font-semibold"
-                                                : "border-border bg-background hover:bg-muted"
-                                            }`}
+                      className={`flex flex-col items-center rounded-lg border px-1 py-2 transition-colors ${
+                        isDisabled
+                          ? "cursor-not-allowed opacity-50"
+                          : "cursor-pointer hover:bg-muted"
+                      } ${
+                        isSelected
+                          ? "border-primary bg-primary/10 font-semibold text-primary"
+                          : "border-border bg-background"
+                      }`}
                     >
                       <span className="body-sm-semibold">{value}</span>
                       <span className="caption-xs text-muted-foreground">
@@ -174,30 +208,29 @@ export function DialogEdit({
                 })}
               </div>
               <p
-                className={`caption-xs ${hasClub ? "text-warning" : "text-muted-foreground"}`}
+                className={`caption-xs ${
+                  hasClub ? "text-warning" : "text-muted-foreground"
+                }`}
               >
-                Jogador com clube não muda de posição: as outras posições ficam
-                desabilitadas.
+                Jogador com clube não muda de posição: as outras posições ficam desabilitadas.
               </p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <NumericField
                 id="age"
                 label="Idade"
                 value={form.age}
-                min={player.age}
-                max={45}
                 onChange={(value) => updateField("age", value)}
-                hint="De 16 a 45 anos."
+                error={fieldErrors.age}
+                hint={`De ${player.age} a 45 anos.`}
               />
               <NumericField
                 id="agility"
                 label="Agilidade"
-                min={1}
-                max={100}
                 value={form.agility}
                 onChange={(value) => updateField("agility", value)}
+                error={fieldErrors.agility}
                 hint="De 1 a 100."
               />
             </div>
@@ -207,7 +240,7 @@ export function DialogEdit({
 
           <DialogFooter className="border-t border-border bg-transparent p-0 pt-4">
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 w-full">
                 <Button
                   variant="outline"
                   type="button"

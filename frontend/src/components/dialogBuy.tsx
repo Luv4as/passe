@@ -96,7 +96,10 @@ export function DialogBuy({
                 {error && (
                   <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive font-medium">
                     <Info size={16} className="inline-block mr-2" />
-                    {error}
+                    <div className="flex flex-col gap-1">
+                      <p>Compra Recusada</p>
+                      <p>{error}</p>
+                    </div>
                   </div>
                 )}
                 <CardPlayer
@@ -228,42 +231,42 @@ export function DialogBuy({
         metrics={
           transaction
             ? [
-                {
-                  title: "Valor",
-                  subtitle: "Valor de mercado no momento da compra",
-                  value: formatCoins(transaction.value),
-                },
-                {
-                  title: "Taxa",
-                  subtitle:
-                    transaction.fee > 0
-                      ? "5% do valor (passa de 30,00)"
-                      : "Isento de taxa",
-                  value: formatCoins(transaction.fee),
-                },
-                {
-                  title: "Custo total",
-                  subtitle: "Valor + taxa",
-                  value: formatCoins(totalCost),
-                  highlighted: true,
-                },
-                {
-                  title: "Fim da fidelidade",
-                  subtitle: "Calculado pela API",
-                  value: formatDate(transaction.contract.loyalty_until),
-                },
-                {
-                  title: "Contrato",
-                  subtitle: "",
-                  value: transaction.contract.status,
-                },
-                {
-                  title: `Novo caixa do ${purchasingClub?.name}`,
-                  subtitle: "",
-                  value: formatCoins(transaction.club_cash),
-                  highlighted: true,
-                },
-              ]
+              {
+                title: "Valor",
+                subtitle: "Valor de mercado no momento da compra",
+                value: formatCoins(transaction.value),
+              },
+              {
+                title: "Taxa",
+                subtitle:
+                  transaction.fee > 0
+                    ? "5% do valor (passa de 30,00)"
+                    : "Isento de taxa",
+                value: formatCoins(transaction.fee),
+              },
+              {
+                title: "Custo total",
+                subtitle: "Valor + taxa",
+                value: formatCoins(totalCost),
+                highlighted: true,
+              },
+              {
+                title: "Fim da fidelidade",
+                subtitle: "Calculado pela API",
+                value: formatDate(transaction.contract.loyalty_until),
+              },
+              {
+                title: "Contrato",
+                subtitle: "",
+                value: transaction.contract.status,
+              },
+              {
+                title: `Novo caixa do ${purchasingClub?.name}`,
+                subtitle: "",
+                value: formatCoins(transaction.club_cash),
+                highlighted: true,
+              },
+            ]
             : undefined
         }
       />

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useGetClub, ClubPlayerItem } from "../hooks/useGetClub";
 import { IconContainer } from "@/components/ui/icon-container";
-import { Users, Tag, Info } from "lucide-react";
+import { Users, Tag, Info, Shirt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   formatDate,
@@ -115,13 +115,13 @@ export function ClubPlayersTable() {
                 <td colSpan={10} className="py-12 text-center">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
-                      <Users size={24} className="text-muted-foreground" />
+                      <Shirt size={24} className="text-muted-foreground" />
                     </IconContainer>
                     <p className="heading-card text-foreground font-semibold mt-1">
-                      Elenco Vazio
+                      Nenhum jogador no elenco
                     </p>
                     <p className="body-sm text-muted-foreground max-w-sm">
-                      Este clube ainda não possui nenhum jogador contratado.
+                      Compre jogadores livres para montar o elenco. O limite é de 12 jogadores, e o custo de cada compra não pode passar de 50% do caixa.
                     </p>
                   </div>
                 </td>

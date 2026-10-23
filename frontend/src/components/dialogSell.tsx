@@ -21,6 +21,7 @@ import {
   getPlayerInitials,
 } from "../lib/utils";
 import { Player, PlayerCondition } from "../hooks/useTableData";
+import { useRouter } from "next/navigation";
 
 interface DialogSellProps {
   open?: boolean;
@@ -35,6 +36,7 @@ export function DialogSell({
   onConfirm,
   player,
 }: DialogSellProps) {
+  const router = useRouter();
   const [soldPlayer, setSoldPlayer] = useState<Player | null>(null);
   const [transaction, setTransaction] =
     useState<SellTransactionResponse | null>(null);
@@ -94,7 +96,10 @@ export function DialogSell({
             {error && (
               <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-sm text-destructive font-medium">
                 <Info size={16} className="inline-block mr-2" />
-                {error}
+                <div className="flex flex-col gap-1">
+                  <p>Compra Recusada</p>
+                  <p>{error}</p>
+                </div>
               </div>
             )}
             <CardPlayer player={player} marketValue={marketValue} />
@@ -176,57 +181,61 @@ export function DialogSell({
           primaryAction={{
             label: "Ver histórico",
             icon: <History size={16} />,
-            onClick: () => {},
+            onClick: () => {
+              if (player.clubId) {
+                router.push(`/market/clubs/${player.clubId}?tab=historico`);
+              }
+            }
           }}
           metrics={
             transaction
               ? [
-                  {
-                    title: "Valor de compra",
-                    subtitle: "",
-                    value: transaction.purchase_value,
-                  },
-                  {
-                    title: "Valor de venda",
-                    subtitle: "Valor de mercado no momento da venda",
-                    value: transaction.purchase_value,
-                  },
-                  {
-                    title: "Dias restantes",
-                    subtitle: "",
-                    value: transaction.remaining_days,
-                  },
-                  {
-                    title: "Multa",
-                    subtitle: "10% do valor de venda, com teto de 10,00",
-                    value: transaction.penalty.toFixed(2).replace(".", ","),
-                  },
-                  {
-                    title: "Lucro",
-                    subtitle: "",
-                    value: transaction.profit.toFixed(2).replace(".", ","),
-                  },
-                  {
-                    title: "Comissão",
-                    subtitle: "10% do lucro até 10,00 + 20% do que passar",
-                    value: transaction.fee.toFixed(2).replace(".", ","),
-                  },
-                  {
-                    title: "Crédito no caixa",
-                    subtitle: "Valor de venda − multa − comissão",
-                    value: transaction.cash_change.toFixed(2).replace(".", ","),
-                  },
-                  {
-                    title: "Contrato",
-                    subtitle: "",
-                    value: transaction.contract_status,
-                  },
-                  {
-                    title: "Novo caixa do Águias FC",
-                    subtitle: "",
-                    value: transaction.club_cash.toFixed(2).replace(".", ","),
-                  },
-                ]
+                {
+                  title: "Valor de compra",
+                  subtitle: "",
+                  value: transaction.purchase_value,
+                },
+                {
+                  title: "Valor de venda",
+                  subtitle: "Valor de mercado no momento da venda",
+                  value: transaction.purchase_value,
+                },
+                {
+                  title: "Dias restantes",
+                  subtitle: "",
+                  value: transaction.remaining_days,
+                },
+                {
+                  title: "Multa",
+                  subtitle: "10% do valor de venda, com teto de 10,00",
+                  value: transaction.penalty.toFixed(2).replace(".", ","),
+                },
+                {
+                  title: "Lucro",
+                  subtitle: "",
+                  value: transaction.profit.toFixed(2).replace(".", ","),
+                },
+                {
+                  title: "Comissão",
+                  subtitle: "10% do lucro até 10,00 + 20% do que passar",
+                  value: transaction.fee.toFixed(2).replace(".", ","),
+                },
+                {
+                  title: "Crédito no caixa",
+                  subtitle: "Valor de venda − multa − comissão",
+                  value: transaction.cash_change.toFixed(2).replace(".", ","),
+                },
+                {
+                  title: "Contrato",
+                  subtitle: "",
+                  value: transaction.contract_status,
+                },
+                {
+                  title: "Novo caixa do Águias FC",
+                  subtitle: "",
+                  value: transaction.club_cash.toFixed(2).replace(".", ","),
+                },
+              ]
               : undefined
           }
         />

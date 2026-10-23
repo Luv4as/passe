@@ -12,8 +12,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Eye, Info, LockKeyhole, Plus, UserRound } from "lucide-react";
-import { ReactElement, useState } from "react";
+import { AlertCircle, Eye, Info, LockKeyhole, Plus, UserRound } from "lucide-react";
+import { ReactElement, useState, useMemo } from "react";
 import { StatsPreview } from "./statsPreview";
 import {
   positions,
@@ -71,12 +71,14 @@ function NumericField({
   value,
   onChange,
   hint,
+  error,
 }: {
   id: string;
   label: string;
   value: number;
   onChange: (value: number) => void;
   hint?: string;
+  error?: string;
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-2">
@@ -87,14 +89,18 @@ function NumericField({
         id={id}
         name={id}
         type="number"
-        min={1}
-        max={99}
-        value={value}
+        value={value || ""}
         onChange={(event) => onChange(Number(event.target.value))}
+        className={error ? "border-destructive focus-visible:ring-destructive" : ""}
       />
-      {hint && (
+      {error ? (
+        <p className="caption-xs flex items-center gap-1 text-destructive font-medium">
+          <AlertCircle size={12} className="shrink-0" />
+          {error}
+        </p>
+      ) : hint ? (
         <p className="caption-xs leading-4 text-muted-foreground">{hint}</p>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -109,10 +115,10 @@ export function DialogNewPlayer({
   onPlayerCreated,
 }: DialogNewPlayerProps) {
   const [open, setOpen] = useState(false);
-  const [createdPlayer, setCreatedPlayer] = useState<CreatedPlayer | null>(
-    null,
-  );
+  const [createdPlayer, setCreatedPlayer] = useState<CreatedPlayer | null>(null);
   const [drawerPlayer, setDrawerPlayer] = useState<Player | null>(null);
+  const [touched, setTouched] = useState(false);
+
   const { form, saving, error, updateField, createPlayer } = useCreatePlayer({
     onSuccess: (player) => {
       setOpen(false);
@@ -121,8 +127,39 @@ export function DialogNewPlayer({
     },
   });
 
+  const fieldErrors = useMemo(() => {
+    const errors: Record<string, string> = {};
+
+    if (form.name.trim().length > 0 && form.name.trim().length < 3) {
+      errors.name = "Use de 3 a 100 caracteres.";
+    }
+
+    if (form.age < 16 || form.age > 45) {
+      errors.age = "Use uma idade de 16 a 45 anos.";
+    }
+
+    const statsKeys = ["pace", "shooting", "passing", "dribbling", "defending", "physical"] as const;
+    statsKeys.forEach((key) => {
+      if (form[key] < 1 || form[key] > 99) {
+        errors[key] = "Use um valor de 1 a 99.";
+      }
+    });
+
+    if (!form.potential) {
+      errors.potential = "Informe o potencial.";
+    } else if (form.potential < 1 || form.potential > 99) {
+      errors.potential = "Use um valor de 1 a 99.";
+    }
+
+    return errors;
+  }, [form]);
+
+  const hasErrors = Object.keys(fieldErrors).length > 0;
+
   function handleSubmit(event: React.SubmitEvent) {
     event.preventDefault();
+    setTouched(true);
+    if (hasErrors) return;
     createPlayer();
   }
 
@@ -153,8 +190,13 @@ export function DialogNewPlayer({
                 Novo jogador
               </DialogTitle>
               <DialogDescription>
-                Preencha os dados e os indicadores técnicos. O valor base, o
-                overall e o valor de mercado são calculados ao salvar.
+                {touched && hasErrors ? (
+                  <span className="text-destructive font-medium">
+                    Corrija os campos destacados para salvar.
+                  </span>
+                ) : (
+                  "Preencha os dados e os indicadores técnicos. O valor base, o overall e o valor de mercado são calculados ao salvar."
+                )}
               </DialogDescription>
             </DialogHeader>
 
@@ -170,19 +212,22 @@ export function DialogNewPlayer({
                   />
                   <Input
                     id="player-name"
-                    className="pl-9"
+                    className={`pl-9 ${fieldErrors.name ? "border-destructive focus-visible:ring-destructive" : ""}`}
                     value={form.name}
-                    onChange={(event) =>
-                      updateField("name", event.target.value)
-                    }
+                    onChange={(event) => updateField("name", event.target.value)}
                     placeholder="Nome do jogador"
-                    required
                   />
                 </div>
-                <p className="caption-xs text-muted-foreground">
-                  De 3 a 100 caracteres, com pelo menos duas palavras e sem
-                  números.
-                </p>
+                {fieldErrors.name ? (
+                  <p className="caption-xs flex items-center gap-1 text-destructive font-medium">
+                    <AlertCircle size={12} className="shrink-0" />
+                    {fieldErrors.name}
+                  </p>
+                ) : (
+                  <p className="caption-xs text-muted-foreground">
+                    De 3 a 100 caracteres, com pelo menos duas palavras e sem números.
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-2">
@@ -193,12 +238,11 @@ export function DialogNewPlayer({
                       key={value}
                       type="button"
                       onClick={() => updateField("position", value)}
-                      className={`flex flex-col items-center rounded-lg border px-1 py-2 
-                                            ${
-                                              form.position === value
-                                                ? "border-primary bg-primary/5 text-primary"
-                                                : "border-border bg-background"
-                                            }`}
+                      className={`flex flex-col items-center rounded-lg border px-1 py-2 ${
+                        form.position === value
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-border bg-background"
+                      }`}
                     >
                       <strong className="body-sm">{value}</strong>
                       <span className="caption-xs text-muted-foreground">
@@ -215,6 +259,7 @@ export function DialogNewPlayer({
                   label="Idade"
                   value={form.age}
                   onChange={(value) => updateField("age", value)}
+                  error={fieldErrors.age}
                   hint="De 16 a 45 anos."
                 />
                 <NumericField
@@ -222,7 +267,8 @@ export function DialogNewPlayer({
                   label="Agilidade"
                   value={form.agility}
                   onChange={(value) => updateField("agility", value)}
-                  hint="De 1 a 100."
+                  error={fieldErrors.agility}
+                  hint="De 1 a 100 (até 85 com 35 anos ou mais)."
                 />
                 <div className="flex flex-col gap-2">
                   <span className="body-sm-medium text-muted-foreground">
@@ -239,7 +285,7 @@ export function DialogNewPlayer({
               </div>
 
               <div className="border-t border-border pt-4">
-                <h3 className="heading ">Indicadores técnicos</h3>
+                <h3 className="heading">Indicadores técnicos</h3>
                 <p className="mt-1 body-sm text-muted-foreground">
                   Seis atributos e o potencial, de 1 a 99. Não mudam depois do
                   cadastro; a soma dos seis atributos não pode passar de 480.
@@ -253,42 +299,49 @@ export function DialogNewPlayer({
                     label="Velocidade"
                     value={form.pace}
                     onChange={(value) => updateField("pace", value)}
+                    error={fieldErrors.pace}
                   />
                   <NumericField
                     id="shooting"
                     label="Finalização"
                     value={form.shooting}
                     onChange={(value) => updateField("shooting", value)}
+                    error={fieldErrors.shooting}
                   />
                   <NumericField
                     id="passing"
                     label="Passe"
                     value={form.passing}
                     onChange={(value) => updateField("passing", value)}
+                    error={fieldErrors.passing}
                   />
                   <NumericField
                     id="dribbling"
                     label="Drible"
                     value={form.dribbling}
                     onChange={(value) => updateField("dribbling", value)}
+                    error={fieldErrors.dribbling}
                   />
                   <NumericField
                     id="defending"
                     label="Defesa"
                     value={form.defending}
                     onChange={(value) => updateField("defending", value)}
+                    error={fieldErrors.defending}
                   />
                   <NumericField
                     id="physical"
                     label="Físico"
                     value={form.physical}
                     onChange={(value) => updateField("physical", value)}
+                    error={fieldErrors.physical}
                   />
                   <NumericField
                     id="potential"
                     label="Potencial"
                     value={form.potential}
                     onChange={(value) => updateField("potential", value)}
+                    error={fieldErrors.potential}
                     hint="≥ maior atributo; igual a ele com 33+ anos"
                   />
                   <div className="flex flex-col gap-2">
@@ -308,7 +361,6 @@ export function DialogNewPlayer({
               </div>
             </div>
 
-            {error && <p className="mb-3 body-sm text-destructive">{error}</p>}
             <DialogFooter className="border-t border-border bg-transparent p-0 pt-4">
               <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2 caption-xs text-muted-foreground">
@@ -331,6 +383,7 @@ export function DialogNewPlayer({
           </form>
         </DialogContent>
       </Dialog>
+
       <DialogSucess
         title="Jogador cadastrado"
         description={`${createdPlayer?.name} entrou livre e Apto. Valores em moedas, calculados pela API ao salvar.`}
@@ -346,6 +399,7 @@ export function DialogNewPlayer({
         }}
         closeText="Fechar"
       />
+
       {drawerPlayer && (
         <DrawerInfo
           open={drawerPlayer !== null}
