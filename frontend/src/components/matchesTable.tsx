@@ -16,8 +16,11 @@ import { useGetClubs } from "@/src/hooks/useGetClubs";
 import { ComboboxOptions } from "./comboboxOptions";
 import { IconContainer } from "@/components/ui/icon-container";
 import { DialogNewMatch } from "./dialogNewMatch";
+import { useRouter } from "next/navigation";
 
 export function MatchesTable() {
+  const router = useRouter();
+
   const {
     getMatches,
     matches,
@@ -227,6 +230,9 @@ export function MatchesTable() {
                         variant="ghost"
                         size="sm"
                         className="text-foreground hover:text-foreground/80 body-sm-medium h-8"
+                        onClick={() => {
+                          router.push(`/league/matches/${match.id}`);
+                        }}
                       >
                         Ver duelos
                         <ChevronRight size={16} className="ml-1" />

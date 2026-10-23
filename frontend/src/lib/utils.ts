@@ -58,3 +58,18 @@ export function getPlayerInitials(name?: string): string {
     .join("")
     .toUpperCase();
 }
+
+export const ATTRIBUTE_TRANSLATIONS: Record<string, string> = {
+  shooting: "Finalização",
+  passing: "Passe",
+  dribbling: "Drible",
+  defending: "Defesa",
+  pace: "Ritmo",
+  physical: "Físico",
+  agility: "Agilidade",
+};
+
+export function translateAttribute(attr?: string): string {
+  if (!attr) return "—";
+  return ATTRIBUTE_TRANSLATIONS[attr.toLowerCase()] || attr;
+}

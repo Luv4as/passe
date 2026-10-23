@@ -82,7 +82,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           </span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
           <span className="body-sm-medium text-foreground">
-            {routeFormatted[routeFormatted.length - 1] ?? ""}
+            {customTitle ?? routeFormatted[routeFormatted.length - 1] ?? ""}
           </span>
         </div>
       </header>
