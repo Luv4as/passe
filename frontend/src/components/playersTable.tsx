@@ -11,6 +11,7 @@ import {
   Trash2,
   Users,
   Info,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -29,6 +30,7 @@ import { DialogBuy } from "./dialogBuy";
 import { SortOption, SortTable } from "./sortTable";
 import { IconContainer } from "@/components/ui/icon-container";
 import { DialogNewPlayer } from "./dialogNewPlayer";
+import { Button } from "@/components/ui/button";
 
 const conditionClasses: Record<PlayerCondition, string> = {
   Apto: "border-success-soft-border bg-success-soft text-success-soft-foreground",
@@ -95,9 +97,10 @@ interface PlayersTableProps {
     | "minValue"
     | "maxValue"
   >;
+  onClearFilters?: () => void;
 }
 
-export default function PlayersTable({ filters = {} }: PlayersTableProps) {
+export default function PlayersTable({ filters = {}, onClearFilters }: PlayersTableProps) {
   const [tab, setTab] = useState<"Todos" | "Livres" | "Em clubes">("Todos");
   const [sortOption, setSortOption] = useState<PlayerSortValue>("name");
   const [page, setPage] = useState(1);
@@ -232,19 +235,51 @@ export default function PlayersTable({ filters = {} }: PlayersTableProps) {
             ) : visiblePlayers.length === 0 ? (
               <tr>
                 <td colSpan={10} className="py-12 text-center">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
-                      <Users size={24} className="text-muted-foreground" />
-                    </IconContainer>
-                    <p className="heading-card text-foreground font-semibold mt-1">
-                      Nenhum jogador cadastrado
-                    </p>
-                    <p className="body-sm text-muted-foreground max-w-sm">
-                      Crie o primeiro jogador com nome e posição. Ele começa com
-                      100,00 em caixa e sem clube.
-                    </p>
-                    <DialogNewPlayer />
-                  </div>
+                  {filters.search ||
+                    filters.position ||
+                    filters.condition ||
+                    filters.clubId !== undefined ||
+                    filters.minAge !== undefined ||
+                    filters.maxAge !== undefined ||
+                    filters.minValue !== undefined ||
+                    filters.maxValue !== undefined ? (
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
+                        <Users size={24} className="text-muted-foreground" />
+                      </IconContainer>
+                      <p className="heading-card text-foreground font-semibold mt-1">
+                        Nenhum jogador encontrado para “{filters.search || filters.position || filters.condition || filters.clubId || filters.minAge || filters.maxAge || filters.minValue || filters.maxValue}”
+                      </p>
+                      <p className="body-sm text-muted-foreground max-w-sm">
+                        Confira a grafia ou tire alguns filtros. A busca ignora maiúsculas, minúsculas e acentos.
+                      </p>
+                      {onClearFilters && (
+                        <Button
+                          type="button"
+                          variant={"outline"}
+                          onClick={onClearFilters}
+                          className=""
+                        >
+                          <X size={16} className="mr-1.5" />
+                          Limpar filtros
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <IconContainer className="bg-muted border border-border h-12 w-12 flex items-center justify-center rounded-xl">
+                        <Users size={24} className="text-muted-foreground" />
+                      </IconContainer>
+                      <p className="heading-card text-foreground font-semibold mt-1">
+                        Nenhum jogador cadastrado
+                      </p>
+                      <p className="body-sm text-muted-foreground max-w-sm">
+                        Crie o primeiro jogador com nome e posição. Ele começa com
+                        100,00 em caixa e sem clube.
+                      </p>
+                      <DialogNewPlayer />
+                    </div>
+                  )}
                 </td>
               </tr>
             ) : (

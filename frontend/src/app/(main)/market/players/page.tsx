@@ -8,7 +8,29 @@ import { useEffect, useState } from "react";
 
 export default function PlayersPage() {
   const { setHeaderAction } = useHeaderAction();
-  const [filters, setFilters] = useState<TableFilters>({});
+  const [filters, setFilters] = useState<TableFilters>({
+    search: "",
+    position: "",
+    condition: undefined,
+    clubId: undefined,
+    minAge: undefined,
+    maxAge: undefined,
+    minValue: undefined,
+    maxValue: undefined,
+  });
+
+const handleClearFilters = () => {
+    setFilters({
+      search: "",
+      position: undefined,
+      condition: undefined,
+      clubId: undefined,
+      minAge: undefined,
+      maxAge: undefined,
+      minValue: undefined,
+      maxValue: undefined,
+    });
+  };
 
   useEffect(() => {
     setHeaderAction(<DialogNewPlayer />);
@@ -18,7 +40,10 @@ export default function PlayersPage() {
   return (
     <div>
       <TableFilter filters={filters} onFiltersChange={setFilters} />
-      <PlayersTable key={JSON.stringify(filters)} filters={filters} />
+      <PlayersTable 
+      key={JSON.stringify(filters)} 
+      onClearFilters={handleClearFilters}
+      filters={filters} />
     </div>
   );
 }
